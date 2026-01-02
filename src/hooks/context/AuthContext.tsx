@@ -16,8 +16,10 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   );
 
   const login = (token: string) => {
-    localStorage.setItem('authToken', token);
-    setIsAuthenticated(true);
+    // Token is already stored by authService, but we verify it here
+    if (token && authService.isAuthenticated()) {
+      setIsAuthenticated(true);
+    }
   };
 
   const logout = () => {

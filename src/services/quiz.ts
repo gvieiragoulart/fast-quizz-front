@@ -13,7 +13,7 @@ export const quizService = {
       const response = await api.get<Question[]>(`/api/questions?quiz_id=${quizId}`);
       return response.data;
     } catch {
-      // Fallback to alternative endpoint format
+      // Fallback to alternative endpoint format if first fails
       const response = await api.get<{ questions: Question[] }>(
         `/api/quizzes/${quizId}?include_questions=true`
       );
@@ -30,7 +30,7 @@ export const quizService = {
       );
       return response.data;
     } catch {
-      // Fallback to alternative endpoint format
+      // Fallback to alternative endpoint format if first fails
       const response = await api.post<QuizResult>('/api/questions/answers', data);
       return response.data;
     }
