@@ -15,7 +15,11 @@ export default function RegisterPage() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const response = await registerMutation.mutateAsync({ email, password, name });
+      const response = await registerMutation.mutateAsync({ 
+        email, 
+        password, 
+        name: name.trim() || undefined 
+      });
       setAuth(response.token);
       navigate('/quizzes');
     } catch (error) {
@@ -86,7 +90,9 @@ export default function RegisterPage() {
 
           {registerMutation.isError && (
             <div className="text-red-600 text-sm text-center">
-              Registration failed. Please try again.
+              Registration failed. {registerMutation.error instanceof Error 
+                ? registerMutation.error.message 
+                : 'Please try again.'}
             </div>
           )}
 

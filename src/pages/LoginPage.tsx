@@ -71,7 +71,9 @@ export default function LoginPage() {
 
           {loginMutation.isError && (
             <div className="text-red-600 text-sm text-center">
-              Login failed. Please check your credentials.
+              Login failed. {loginMutation.error instanceof Error 
+                ? loginMutation.error.message 
+                : 'Please check your credentials.'}
             </div>
           )}
 
