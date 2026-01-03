@@ -84,13 +84,13 @@ export default function QuizzesPage() {
         <div className="px-4 py-6 sm:px-0">
           <h2 className="text-2xl font-bold text-gray-900 mb-6">Available Quizzes</h2>
           
-          {quizzes && quizzes.length === 0 ? (
+          {quizzes && quizzes.items.length === 0 ? (
             <div className="text-center py-12">
               <p className="text-gray-500">No quizzes available at the moment.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {quizzes?.map((quiz) => (
+              {quizzes?.items.map((quiz) => (
                 <div
                   key={quiz.id}
                   className="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow"
@@ -102,11 +102,6 @@ export default function QuizzesPage() {
                     {quiz.description && (
                       <p className="text-sm text-gray-500 mb-4">
                         {quiz.description}
-                      </p>
-                    )}
-                    {quiz.questionCount && (
-                      <p className="text-xs text-gray-400 mb-4">
-                        {quiz.questionCount} questions
                       </p>
                     )}
                     <button

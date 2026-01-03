@@ -1,9 +1,9 @@
 import api from './api';
-import type { Quiz, Question, SubmitQuizRequest, QuizResult } from '../types';
+import type { Question, SubmitQuizRequest, QuizResult, QuizListResponse } from '../types';
 
 export const quizService = {
-  async getQuizzes(): Promise<Quiz[]> {
-    const response = await api.get<Quiz[]>('/api/quizzes');
+  async getQuizzes(): Promise<QuizListResponse> {
+    const response = await api.get<QuizListResponse>('/api/quizzes/latest');
     return response.data;
   },
 

@@ -28,9 +28,15 @@ export interface RegisterResponse {
 export interface Quiz {
   id: string;
   title: string;
-  description?: string;
-  questionCount?: number;
+  description: string;
+  questions?: Array<string>;
   createdAt?: string;
+}
+
+export interface QuizListResponse {
+  items: Quiz[];
+  total_items: number;
+  total_pages: number;
 }
 
 export interface Question {
