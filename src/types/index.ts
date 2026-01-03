@@ -14,6 +14,17 @@ export interface LoginResponse {
   user: User;
 }
 
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  name?: string;
+}
+
+export interface RegisterResponse {
+  token: string;
+  user: User;
+}
+
 export interface Quiz {
   id: string;
   title: string;

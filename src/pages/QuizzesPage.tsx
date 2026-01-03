@@ -4,12 +4,12 @@ import { useAuth } from '../hooks/useAuth';
 
 export default function QuizzesPage() {
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const { data: quizzes, isLoading, isError } = useQuizzes();
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/quizzes');
   };
 
   const handleStartQuiz = (quizId: string) => {
@@ -51,13 +51,30 @@ export default function QuizzesPage() {
             <div className="flex items-center">
               <h1 className="text-xl font-bold text-gray-900">Fast Quiz</h1>
             </div>
-            <div className="flex items-center">
-              <button
-                onClick={handleLogout}
-                className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900"
-              >
-                Logout
-              </button>
+            <div className="flex items-center space-x-4">
+              {isAuthenticated ? (
+                <button
+                  onClick={handleLogout}
+                  className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900"
+                >
+                  Logout
+                </button>
+              ) : (
+                <>
+                  <button
+                    onClick={() => navigate('/login')}
+                    className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900"
+                  >
+                    Login
+                  </button>
+                  <button
+                    onClick={() => navigate('/register')}
+                    className="px-4 py-2 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
+                  >
+                    Register
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

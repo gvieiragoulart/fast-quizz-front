@@ -1,8 +1,8 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { AuthProvider } from './hooks/useAuth';
-import ProtectedRoute from './components/ProtectedRoute';
 import LoginPage from './pages/LoginPage';
+import RegisterPage from './pages/RegisterPage';
 import QuizzesPage from './pages/QuizzesPage';
 import QuizPage from './pages/QuizPage';
 import ResultsPage from './pages/ResultsPage';
@@ -23,31 +23,11 @@ function App() {
         <Router>
           <Routes>
             <Route path="/login" element={<LoginPage />} />
-            <Route
-              path="/quizzes"
-              element={
-                <ProtectedRoute>
-                  <QuizzesPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/quiz/:quizId"
-              element={
-                <ProtectedRoute>
-                  <QuizPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/quiz/:quizId/results"
-              element={
-                <ProtectedRoute>
-                  <ResultsPage />
-                </ProtectedRoute>
-              }
-            />
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/register" element={<RegisterPage />} />
+            <Route path="/quizzes" element={<QuizzesPage />} />
+            <Route path="/quiz/:quizId" element={<QuizPage />} />
+            <Route path="/quiz/:quizId/results" element={<ResultsPage />} />
+            <Route path="/" element={<Navigate to="/quizzes" replace />} />
           </Routes>
         </Router>
       </AuthProvider>

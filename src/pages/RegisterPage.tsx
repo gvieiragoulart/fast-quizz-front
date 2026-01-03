@@ -1,24 +1,25 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { useLogin } from '../hooks/useApi';
+import { useRegister } from '../hooks/useApi';
 import { useAuth } from '../hooks/useAuth';
 
-export default function LoginPage() {
+export default function RegisterPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const navigate = useNavigate();
   const { login: setAuth } = useAuth();
-  const loginMutation = useLogin();
+  const registerMutation = useRegister();
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     try {
-      const response = await loginMutation.mutateAsync({ email, password });
+      const response = await registerMutation.mutateAsync({ email, password, name });
       setAuth(response.token);
       navigate('/quizzes');
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error('Registration failed:', error);
     }
   };
 
@@ -30,11 +31,25 @@ export default function LoginPage() {
             Fast Quiz
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Sign in to your account
+            Create your account
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           <div className="space-y-4">
+            <div>
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
+                Name (optional)
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+                placeholder="Your name"
+              />
+            </div>
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700">
                 Email address
@@ -59,7 +74,7 @@ export default function LoginPage() {
                 id="password"
                 name="password"
                 type="password"
-                autoComplete="current-password"
+                autoComplete="new-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -69,38 +84,29 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {loginMutation.isError && (
+          {registerMutation.isError && (
             <div className="text-red-600 text-sm text-center">
-              Login failed. Please check your credentials.
+              Registration failed. Please try again.
             </div>
           )}
 
           <button
             type="submit"
-            disabled={loginMutation.isPending}
+            disabled={registerMutation.isPending}
             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-400"
           >
-            {loginMutation.isPending ? 'Signing in...' : 'Sign in'}
+            {registerMutation.isPending ? 'Creating account...' : 'Create account'}
           </button>
 
           <div className="text-center">
             <p className="text-sm text-gray-600">
-              Don't have an account?{' '}
-              <Link to="/register" className="font-medium text-indigo-600 hover:text-indigo-500">
-                Create one
+              Already have an account?{' '}
+              <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
+                Sign in
               </Link>
             </p>
           </div>
         </form>
-
-        <div className="text-center pt-4 border-t border-gray-200">
-          <Link
-            to="/quizzes"
-            className="text-sm text-indigo-600 hover:text-indigo-500"
-          >
-            Continue as guest
-          </Link>
-        </div>
       </div>
     </div>
   );

@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authService } from '../services/auth';
 import { quizService } from '../services/quiz';
-import type { LoginRequest, SubmitQuizRequest } from '../types';
+import type { LoginRequest, RegisterRequest, SubmitQuizRequest } from '../types';
 
 export const useLogin = () => {
   const queryClient = useQueryClient();
@@ -14,11 +14,21 @@ export const useLogin = () => {
   });
 };
 
+export const useRegister = () => {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (userData: RegisterRequest) => authService.register(userData),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['user'] });
+    },
+  });
+};
+
 export const useQuizzes = () => {
   return useQuery({
     queryKey: ['quizzes'],
     queryFn: () => quizService.getQuizzes(),
-    enabled: authService.isAuthenticated(),
   });
 };
 
@@ -26,7 +36,7 @@ export const useQuizQuestions = (quizId: string) => {
   return useQuery({
     queryKey: ['quiz', quizId, 'questions'],
     queryFn: () => quizService.getQuizQuestions(quizId),
-    enabled: !!quizId && authService.isAuthenticated(),
+    enabled: !!quizId,
   });
 };
 
