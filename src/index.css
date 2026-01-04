@@ -1,3 +1,6 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* Global styles: Tailwind removed. MUI's CssBaseline handles most resets. */
+html, body, #root {
+	height: 100%;
+}
+
+/* Keep this file for any small global overrides (fonts, body background, etc.) */

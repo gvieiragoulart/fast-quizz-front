@@ -1,119 +1,104 @@
-import { useState } from 'react';
-import type { FormEvent } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useRegister } from '../hooks/useApi';
-import { useAuth } from '../hooks/useAuth';
+import { useState } from 'react'
+import type { FormEvent } from 'react'
+import { Link as RouterLink, useNavigate } from 'react-router-dom'
+import { useRegister } from '../hooks/useApi'
+import { useAuth } from '../hooks/useAuth'
+import Container from '@mui/material/Container'
+import Box from '@mui/material/Box'
+import Typography from '@mui/material/Typography'
+import TextField from '@mui/material/TextField'
+import Button from '@mui/material/Button'
+import Alert from '@mui/material/Alert'
+import Link from '@mui/material/Link'
 
 export default function RegisterPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [name, setName] = useState('');
-  const navigate = useNavigate();
-  const { login: setAuth } = useAuth();
-  const registerMutation = useRegister();
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [name, setName] = useState('')
+  const navigate = useNavigate()
+  const { login: setAuth } = useAuth()
+  const registerMutation = useRegister()
 
   const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
+    e.preventDefault()
     try {
-      const response = await registerMutation.mutateAsync({ 
-        email, 
-        password, 
-        name: name.trim() || undefined 
-      });
-      setAuth(response.token);
-      navigate('/quizzes');
+      const response = await registerMutation.mutateAsync({
+        email,
+        password,
+        name: name.trim() || undefined,
+      })
+      setAuth(response.token)
+      navigate('/quizzes')
     } catch (error) {
-      console.error('Registration failed:', error);
+      console.error('Registration failed:', error)
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow-md">
-        <div>
-          <h2 className="text-center text-3xl font-bold text-gray-900">
-            Fast Quiz
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Create your account
-          </p>
-        </div>
-        <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          <div className="space-y-4">
-            <div>
-              <label htmlFor="name" className="block text-sm font-medium text-gray-700">
-                Name (optional)
-              </label>
-              <input
-                id="name"
-                name="name"
-                type="text"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="Your name"
-              />
-            </div>
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
-                Email address
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="your@email.com"
-              />
-            </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-                placeholder="••••••••"
-              />
-            </div>
-          </div>
+    <Container maxWidth="sm">
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Box sx={{ width: '100%', bgcolor: 'background.paper', p: 4, borderRadius: 2, boxShadow: 1 }}>
+          <Typography variant="h4" align="center">Fast Quiz</Typography>
+          <Typography variant="body2" align="center" color="text.secondary" sx={{ mt: 1 }}>Create your account</Typography>
 
-          {registerMutation.isError && (
-            <div className="text-red-600 text-sm text-center">
-              Registration failed. {registerMutation.error instanceof Error 
-                ? registerMutation.error.message 
-                : 'Please try again.'}
-            </div>
-          )}
+          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
+            <TextField
+              label="Name (optional)"
+              id="name"
+              name="name"
+              type="text"
+              fullWidth
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
+              sx={{ mb: 2 }}
+            />
 
-          <button
-            type="submit"
-            disabled={registerMutation.isPending}
-            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-gray-400"
-          >
-            {registerMutation.isPending ? 'Creating account...' : 'Create account'}
-          </button>
+            <TextField
+              label="Email address"
+              id="email"
+              name="email"
+              type="email"
+              autoComplete="email"
+              required
+              fullWidth
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="your@email.com"
+              sx={{ mb: 2 }}
+            />
 
-          <div className="text-center">
-            <p className="text-sm text-gray-600">
+            <TextField
+              label="Password"
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="new-password"
+              required
+              fullWidth
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="••••••••"
+              sx={{ mb: 2 }}
+            />
+
+            {registerMutation.isError && (
+              <Alert severity="error" sx={{ mb: 2 }}>
+                Registration failed. {registerMutation.error instanceof Error ? registerMutation.error.message : 'Please try again.'}
+              </Alert>
+            )}
+
+            <Button type="submit" variant="contained" fullWidth disabled={(registerMutation as any).isPending}>
+              {(registerMutation as any).isPending ? 'Creating account...' : 'Create account'}
+            </Button>
+
+            <Typography align="center" sx={{ mt: 2 }}>
               Already have an account?{' '}
-              <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-                Sign in
-              </Link>
-            </p>
-          </div>
-        </form>
-      </div>
-    </div>
-  );
+              <Link component={RouterLink} to="/login">Sign in</Link>
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+    </Container>
+  )
 }

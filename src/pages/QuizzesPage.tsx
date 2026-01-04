@@ -1,122 +1,107 @@
-import { useNavigate } from 'react-router-dom';
-import { useQuizzes } from '../hooks/useApi';
-import { useAuth } from '../hooks/useAuth';
+import { useNavigate } from 'react-router-dom'
+import { useQuizzes } from '../hooks/useApi'
+import { useAuth } from '../hooks/useAuth'
+import AppBar from '@mui/material/AppBar'
+import Toolbar from '@mui/material/Toolbar'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+import Box from '@mui/material/Box'
+import Container from '@mui/material/Container'
+import Grid from '@mui/material/Grid'
+import Card from '@mui/material/Card'
+import CardContent from '@mui/material/CardContent'
+import CircularProgress from '@mui/material/CircularProgress'
+import Alert from '@mui/material/Alert'
 
 export default function QuizzesPage() {
-  const navigate = useNavigate();
-  const { isAuthenticated, logout } = useAuth();
-  const { data: quizzes, isLoading, isError } = useQuizzes();
+  const navigate = useNavigate()
+  const { isAuthenticated, logout } = useAuth()
+  const { data: quizzes, isLoading, isError } = useQuizzes()
 
   const handleLogout = () => {
-    logout();
-    navigate('/quizzes');
-  };
+    logout()
+    navigate('/quizzes')
+  }
 
   const handleStartQuiz = (quizId: string) => {
-    navigate(`/quiz/${quizId}`);
-  };
+    navigate(`/quiz/${quizId}`)
+  }
 
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading quizzes...</p>
-        </div>
-      </div>
-    );
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Box textAlign="center">
+          <CircularProgress />
+          <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>Loading quizzes...</Typography>
+        </Box>
+      </Box>
+    )
   }
 
   if (isError) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <p className="text-red-600">Failed to load quizzes. Please try again.</p>
-          <button
-            onClick={() => window.location.reload()}
-            className="mt-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
-          >
+      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <Box textAlign="center">
+          <Alert severity="error">Failed to load quizzes. Please try again.</Alert>
+          <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={() => window.location.reload()}>
             Retry
-          </button>
-        </div>
-      </div>
-    );
+          </Button>
+        </Box>
+      </Box>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">Fast Quiz</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              {isAuthenticated ? (
-                <button
-                  onClick={handleLogout}
-                  className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900"
-                >
-                  Logout
-                </button>
-              ) : (
-                <>
-                  <button
-                    onClick={() => navigate('/login')}
-                    className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900"
-                  >
-                    Login
-                  </button>
-                  <button
-                    onClick={() => navigate('/register')}
-                    className="px-4 py-2 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700"
-                  >
-                    Register
-                  </button>
-                </>
-              )}
-            </div>
-          </div>
-        </div>
-      </nav>
+    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
+      <AppBar position="static" color="default" elevation={1}>
+        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          <Typography variant="h6">Fast Quiz</Typography>
+          <Box>
+            {isAuthenticated ? (
+              <Button onClick={handleLogout} color="inherit">Logout</Button>
+            ) : (
+              <>
+                <Button onClick={() => navigate('/login')} color="inherit">Login</Button>
+                <Button onClick={() => navigate('/register')} variant="contained" color="primary" sx={{ ml: 1 }}>
+                  Register
+                </Button>
+              </>
+            )}
+          </Box>
+        </Toolbar>
+      </AppBar>
 
-      <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-        <div className="px-4 py-6 sm:px-0">
-          <h2 className="text-2xl font-bold text-gray-900 mb-6">Available Quizzes</h2>
-          
-          {quizzes && quizzes.items.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-500">No quizzes available at the moment.</p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {quizzes?.items.map((quiz) => (
-                <div
-                  key={quiz.id}
-                  className="bg-white overflow-hidden shadow rounded-lg hover:shadow-lg transition-shadow"
-                >
-                  <div className="px-4 py-5 sm:p-6">
-                    <h3 className="text-lg font-medium text-gray-900 mb-2">
-                      {quiz.title}
-                    </h3>
+      <Container maxWidth="lg" sx={{ py: 6 }}>
+        <Box sx={{ mb: 4 }}>
+          <Typography variant="h5" component="h2" gutterBottom>
+            Available Quizzes
+          </Typography>
+        </Box>
+
+        {quizzes && quizzes.items.length === 0 ? (
+          <Box textAlign="center" sx={{ py: 6 }}>
+            <Typography color="text.secondary">No quizzes available at the moment.</Typography>
+          </Box>
+        ) : (
+          <Grid container spacing={3}>
+            {quizzes?.items.map((quiz) => (
+              <Grid item xs={12} sm={6} md={4} key={quiz.id}>
+                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
+                  <CardContent sx={{ flexGrow: 1 }}>
+                    <Typography variant="h6" gutterBottom>{quiz.title}</Typography>
                     {quiz.description && (
-                      <p className="text-sm text-gray-500 mb-4">
-                        {quiz.description}
-                      </p>
+                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{quiz.description}</Typography>
                     )}
-                    <button
-                      onClick={() => handleStartQuiz(quiz.id)}
-                      className="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
-                    >
+                    <Button fullWidth variant="contained" color="primary" onClick={() => handleStartQuiz(quiz.id)}>
                       Start Quiz
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+                    </Button>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+        )}
+      </Container>
+    </Box>
+  )
 }
