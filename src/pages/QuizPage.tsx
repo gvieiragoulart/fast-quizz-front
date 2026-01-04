@@ -2,8 +2,6 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuizQuestions, useSubmitQuiz } from '../hooks/useApi'
 import type { Answer } from '../types'
-import AppBar from '@mui/material/AppBar'
-import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box'
@@ -101,13 +99,6 @@ export default function QuizPage() {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <AppBar position="static" color="default" elevation={1}>
-        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="h6">Fast Quiz</Typography>
-          <Button onClick={() => navigate('/quizzes')} color="inherit">Exit Quiz</Button>
-        </Toolbar>
-      </AppBar>
-
       <Container maxWidth="md" sx={{ py: 6 }}>
         <Box sx={{ mb: 4 }}>
           <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>

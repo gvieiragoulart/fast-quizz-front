@@ -1,8 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { useQuizzes } from '../hooks/useApi'
 import { useAuth } from '../hooks/useAuth'
-import AppBar from '@mui/material/AppBar'
-import Toolbar from '@mui/material/Toolbar'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box'
@@ -15,13 +13,7 @@ import Alert from '@mui/material/Alert'
 
 export default function QuizzesPage() {
   const navigate = useNavigate()
-  const { isAuthenticated, logout } = useAuth()
   const { data: quizzes, isLoading, isError } = useQuizzes()
-
-  const handleLogout = () => {
-    logout()
-    navigate('/quizzes')
-  }
 
   const handleStartQuiz = (quizId: string) => {
     navigate(`/quiz/${quizId}`)
@@ -52,25 +44,7 @@ export default function QuizzesPage() {
   }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <AppBar position="static" color="default" elevation={1}>
-        <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="h6">Fast Quiz</Typography>
-          <Box>
-            {isAuthenticated ? (
-              <Button onClick={handleLogout} color="inherit">Logout</Button>
-            ) : (
-              <>
-                <Button onClick={() => navigate('/login')} color="inherit">Login</Button>
-                <Button onClick={() => navigate('/register')} variant="contained" color="primary" sx={{ ml: 1 }}>
-                  Register
-                </Button>
-              </>
-            )}
-          </Box>
-        </Toolbar>
-      </AppBar>
-
+    <Box sx={{ minHeight: '100vh' }}>
       <Container maxWidth="lg" sx={{ py: 6 }}>
         <Box sx={{ mb: 4 }}>
           <Typography variant="h5" component="h2" gutterBottom>
