@@ -16,14 +16,12 @@ export const quizService = {
   async getQuizQuestions(quizId: string): Promise<Question[]> {
     // Try first endpoint format
     try {
-      const response = await api.get<Question[]>(`/api/questions?quiz_id=${quizId}`);
+      const response = await api.get<Question[]>(`/api/questions/quiz?quiz_id=${quizId}`);
       return response.data;
-    } catch {
-      // Fallback to alternative endpoint format if first fails
-      const response = await api.get<{ questions: Question[] }>(
-        `/api/quizzes/${quizId}?include_questions=true`
-      );
-      return response.data.questions;
+    } catch (error) {
+      console.log(`Falling back to alternative endpoint for quizId: ${quizId}`);
+      console.log('Error details:', error);
+      throw error;
     }
   },
 

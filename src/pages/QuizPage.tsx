@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuizQuestions, useSubmitQuiz } from '../hooks/useApi'
-import type { Answer } from '../types'
+import type { Answer, Question, QuestionOption, QuizResult } from '../types'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box'
@@ -22,7 +22,7 @@ export default function QuizPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState<Answer[]>([])
 
-  const currentQuestion = questions?.[currentQuestionIndex]
+  const currentQuestion = questions?.[currentQuestionIndex] as Question | undefined
 
   const handleSelectOption = (optionIndex: number) => {
     if (!currentQuestion) return
@@ -32,6 +32,11 @@ export default function QuizPage() {
       questionId: currentQuestion.id,
       selectedOption: optionIndex,
     })
+
+    if (currentQuestion.options[optionIndex]?.is_correct) {
+      console.log('Selected correct option:', currentQuestion.options[optionIndex])
+    }
+    
     setAnswers(newAnswers)
   }
 
@@ -56,8 +61,46 @@ export default function QuizPage() {
     }
 
     try {
-      const result = await submitQuiz.mutateAsync({ quizId, answers })
-      navigate(`/quiz/${quizId}/results`, { state: { result } })
+      const detailedAnswers = answers.map((a) => {
+        const question = questions.find((q) => q.id === a.questionId) as Question | undefined
+        const selectedOptionIndex = a.selectedOption
+        const selectedOption = question?.options[selectedOptionIndex]
+        const correctOptionIndex = question?.options.findIndex((opt) => opt.is_correct) ?? -1
+        const isCorrect = selectedOption?.is_correct === true
+
+        return {
+          questionId: a.questionId,
+          question: question?.text ?? '',
+          selectedOption: selectedOptionIndex,
+          correctOption: correctOptionIndex,
+          isCorrect,
+        }
+      })
+
+      const correctCount = detailedAnswers.filter((d) => d.isCorrect).length
+      const totalQuestions = questions.length
+      const score = totalQuestions > 0 ? (correctCount / totalQuestions) * 100 : 0
+
+      const localResult: QuizResult = {
+        quizId,
+        score,
+        totalQuestions,
+        correctAnswers: correctCount,
+        answers: detailedAnswers,
+      }
+
+      // Attempt to submit to API; if API returns a result use it, otherwise fallback to localResult
+      let apiResult: QuizResult | undefined
+      try {
+        const response = await submitQuiz.mutateAsync({ quizId, answers })
+        if (response && typeof response === 'object' && ('correctAnswers' in response || 'score' in response)) {
+          apiResult = response as QuizResult
+        }
+      } catch (err) {
+        console.error('Submit API failed, will use local result:', err)
+      }
+
+      navigate(`/quiz/${quizId}/results`, { state: { result: apiResult ?? localResult } })
     } catch (error) {
       console.error('Failed to submit quiz:', error)
       alert('Failed to submit quiz. Please try again.')
@@ -113,10 +156,10 @@ export default function QuizPage() {
             <Typography variant="h6" gutterBottom>{currentQuestion?.text}</Typography>
 
             <Grid container spacing={2}>
-              {currentQuestion?.options.map((option, index) => {
+              {currentQuestion?.options.map((option: QuestionOption, index: number) => {
                 const selected = currentAnswer?.selectedOption === index
                 return (
-                  <Grid item xs={12} key={index}>
+                  <Grid item xs={12} key={option.id ?? index}>
                     <Button
                       onClick={() => handleSelectOption(index)}
                       fullWidth
@@ -125,7 +168,7 @@ export default function QuizPage() {
                       sx={{ justifyContent: 'flex-start', py: 2, textTransform: 'none' }}
                       startIcon={selected ? <CheckIcon /> : undefined}
                     >
-                      <Box sx={{ textAlign: 'left' }}>{option}</Box>
+                      <Box sx={{ textAlign: 'left' }}>{option.text}</Box>
                     </Button>
                   </Grid>
                 )

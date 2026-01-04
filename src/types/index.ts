@@ -39,12 +39,19 @@ export interface QuizListResponse {
   total_pages: number;
 }
 
+export interface QuestionOption {
+  id: string;
+  text: string;
+  order: number;
+  is_correct?: boolean;
+}
+
 export interface Question {
   id: string;
-  quizId: string;
   text: string;
-  options: string[];
-  correctAnswer?: number;
+  quiz_id: string;
+  options: QuestionOption[];
+  correctAnswer?: string;
 }
 
 export interface Answer {
