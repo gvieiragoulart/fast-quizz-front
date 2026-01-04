@@ -3,8 +3,14 @@ import type { Question, SubmitQuizRequest, QuizResult, QuizListResponse } from '
 
 export const quizService = {
   async getQuizzes(): Promise<QuizListResponse> {
-    const response = await api.get<QuizListResponse>('/api/quizzes/latest');
-    return response.data;
+    try {
+      const response = await api.get<QuizListResponse>('/api/quizzes/latest');
+      console.log('Fetched quizzes:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching quizzes:', error);
+      throw error;
+    }
   },
 
   async getQuizQuestions(quizId: string): Promise<Question[]> {
