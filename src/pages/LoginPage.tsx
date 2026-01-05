@@ -22,8 +22,8 @@ export default function LoginPage() {
     e.preventDefault()
     try {
       const response = await loginMutation.mutateAsync({ email, password })
-      setAuth(response.token)
-      navigate('/quizzes')
+      setAuth(response.access_token)
+      navigate('/')
     } catch (error) {
       console.error('Login failed:', error)
     }
@@ -82,7 +82,7 @@ export default function LoginPage() {
           </Box>
 
           <Box sx={{ textAlign: 'center', mt: 3, pt: 2, borderTop: 1, borderColor: 'divider' }}>
-            <Link component={RouterLink} to="/quizzes">Continue as guest</Link>
+            <Link component={RouterLink} to="/">Continue as guest</Link>
           </Box>
         </Box>
       </Box>

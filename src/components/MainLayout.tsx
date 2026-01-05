@@ -1,9 +1,11 @@
 import { Outlet, useNavigate } from 'react-router-dom'
-import AppBar from '@mui/material/AppBar'
-import Toolbar from '@mui/material/Toolbar'
-import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
-import Box from '@mui/material/Box'
+import {
+    AppBar,
+    Toolbar,
+    Typography,
+    Button,
+    Box,
+} from '@mui/material'
 import { useAuth } from '../hooks/useAuth'
 
 export default function MainLayout() {
@@ -12,14 +14,30 @@ export default function MainLayout() {
 
   const handleLogout = () => {
     logout()
-    navigate('/quizzes')
+    navigate('/')
   }
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
       <AppBar position="static" color="default" elevation={1}>
         <Toolbar sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Typography variant="h6">Fast Quiz</Typography>
+            <Typography
+                variant="h6"
+                component="div"
+                sx={{
+                    flexGrow: 0,
+                    fontWeight: 'bold',
+                    color: '#2563eb',
+                    mr: 4,
+                }}
+            >
+            <Button onClick={() => navigate('/')}>Fast Quiz</Button>
+            </Typography>
+
+            <Box sx={{ flexGrow: 1, display: 'flex', gap: 2 }}>
+                <Button color="inherit">Explorar</Button>
+                <Button color="inherit">Meus Quizzes</Button>
+            </Box>
           <Box>
             {isAuthenticated ? (
               <Button onClick={handleLogout} color="inherit">Logout</Button>

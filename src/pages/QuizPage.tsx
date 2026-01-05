@@ -128,7 +128,7 @@ export default function QuizPage() {
       <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Box textAlign="center">
           <Alert severity="error">Failed to load quiz. Please try again.</Alert>
-          <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={() => navigate('/quizzes')}>
+          <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={() => navigate('/')}>
             Back to Quizzes
           </Button>
         </Box>

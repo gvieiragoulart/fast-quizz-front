@@ -39,4 +39,13 @@ export const quizService = {
       return response.data;
     }
   },
+  async createQuiz(payload: { title: string; description?: string; questions: Array<{ text: string; options: Array<{ text: string; is_correct?: boolean }> }> }) {
+    try {
+      const response = await api.post('/api/quizzes', payload)
+      return response.data
+    } catch (error) {
+      console.error('Error creating quiz:', error)
+      throw error
+    }
+  },
 };

@@ -4,8 +4,8 @@ import type { LoginRequest, LoginResponse, RegisterRequest, RegisterResponse } f
 export const authService = {
   async login(credentials: LoginRequest): Promise<LoginResponse> {
     const response = await api.post<LoginResponse>('/api/auth/login', credentials);
-    const { token } = response.data;
-    localStorage.setItem('authToken', token);
+    const { access_token } = response.data;
+    localStorage.setItem('authToken', access_token);
     return response.data;
   },
 

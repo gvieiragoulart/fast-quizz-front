@@ -23,7 +23,7 @@ export default function ResultsPage() {
       <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <Box textAlign="center">
           <Typography color="error">No results found.</Typography>
-          <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={() => navigate('/quizzes')}>
+          <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={() => navigate('/')}>
             Back to Quizzes
           </Button>
         </Box>
@@ -48,7 +48,7 @@ export default function ResultsPage() {
               <Typography variant="h6" sx={{ mt: 1 }}>You scored <strong>{result.correctAnswers}</strong> out of <strong>{result.totalQuestions}</strong></Typography>
             </Box>
 
-            <Button variant="contained" color="primary" onClick={() => navigate('/quizzes')}>Take Another Quiz</Button>
+            <Button variant="contained" color="primary" onClick={() => navigate('/')}>Take Another Quiz</Button>
           </CardContent>
         </Card>
 

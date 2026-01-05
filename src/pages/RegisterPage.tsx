@@ -28,7 +28,7 @@ export default function RegisterPage() {
         name: name.trim() || undefined,
       })
       setAuth(response.token)
-      navigate('/quizzes')
+      navigate('/')
     } catch (error) {
       console.error('Registration failed:', error)
     }
