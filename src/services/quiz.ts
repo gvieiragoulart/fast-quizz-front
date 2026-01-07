@@ -1,4 +1,5 @@
 import api from './api';
+import { authService } from './auth';
 import type { Question, SubmitQuizRequest, QuizResult, QuizListResponse } from '../types';
 
 export const quizService = {
@@ -39,13 +40,13 @@ export const quizService = {
       return response.data;
     }
   },
-  async createQuiz(payload: { title: string; description?: string; questions: Array<{ text: string; options: Array<{ text: string; is_correct?: boolean }> }> }) {
+  async createQuiz(payload: { title: string; description?: string; questions: Array<{ text: string; correct_answer: string; options: Array<{ text: string; is_correct?: boolean }> }> }) {
     try {
-      const response = await api.post('/api/quizzes', payload)
-      return response.data
+      const response = await api.post('/api/quizzes', payload);
+      return response.data;
     } catch (error) {
-      console.error('Error creating quiz:', error)
-      throw error
+      console.error('Error creating quiz:', error);
+      throw error;
     }
   },
 };

@@ -1,4 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom'
 import {
   Box,
   Container,
@@ -8,8 +9,6 @@ import {
   Paper,
   IconButton,
   Grid,
-  Card,
-  CardContent,
   MobileStepper,
   Dialog,
   DialogTitle,
@@ -34,9 +33,11 @@ import {
   HelpOutline as HelpIcon,
 } from '@mui/icons-material';
 import type{ Quiz, Question, QuestionOption } from '../types';
+import { useCreateQuiz } from '../hooks/useApi';
+import { Navigate } from 'react-router-dom';
 
 const CreateQuizPage: React.FC = () => {
-  // Estados para o Quiz
+   const navigate = useNavigate();
   const [quizTitle, setQuizTitle] = useState('');
   const [quizDescription, setQuizDescription] = useState('');
   const [questions, setQuestions] = useState<Partial<Question>[]>([
@@ -50,6 +51,8 @@ const CreateQuizPage: React.FC = () => {
       ],
     },
   ]);
+  const { mutate: createQuiz, isError } = useCreateQuiz();
+  
 
   // Estados para o Carrossel
   const [activeStep, setActiveStep] = useState(0);
@@ -115,6 +118,11 @@ const CreateQuizPage: React.FC = () => {
         opt.is_correct = i === optionIndex;
       });
     }
+
+    if (newQuestions[activeStep].options) {
+      const correctOption = newQuestions[activeStep].options!.find(opt => opt.is_correct);
+      newQuestions[activeStep].correct_answer = correctOption ? correctOption.text : '';
+    }
     setQuestions(newQuestions);
   };
 
@@ -176,7 +184,27 @@ const CreateQuizPage: React.FC = () => {
       description: quizDescription,
       questions: questions,
     });
+    createQuiz({
+      title: quizTitle,
+      description: quizDescription,
+      questions: questions as Array<{
+        text: string;
+        correct_answer: string;
+        options: Array<{ text: string; is_correct?: boolean }>;
+      }>,
+    });
+
+    if (isError) {
+      setError('Erro ao salvar o quiz. Tente novamente.');
+      console.log("Erro ao salvar o quiz");
+      return;
+    }
+
+    // Resetar o formulário após salvar
+    setQuizTitle('');
+    setQuizDescription('');
     setSuccessMessage('Quiz salvo com sucesso!');
+    navigate('/');
   };
 
   return (

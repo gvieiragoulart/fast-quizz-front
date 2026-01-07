@@ -20,7 +20,7 @@ export interface RegisterRequest {
 }
 
 export interface RegisterResponse {
-  token: string;
+  access_token: string;
   user: User;
 }
 
@@ -50,7 +50,7 @@ export interface Question {
   text: string;
   quiz_id: string;
   options: QuestionOption[];
-  correctAnswer?: string;
+  correct_answer?: string;
 }
 
 export interface Answer {

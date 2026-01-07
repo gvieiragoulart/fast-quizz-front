@@ -55,9 +55,12 @@ export const useCreateQuiz = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: { title: string; description?: string; questions: Array<{ text: string; options: Array<{ text: string; is_correct?: boolean }> }> }) => quizService.createQuiz(payload),
+    mutationFn: (payload: { title: string; description?: string; questions: Array<{ text: string;  correct_answer: string; options: Array<{ text: string; is_correct?: boolean }> }> }) => quizService.createQuiz(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quizzes'] })
     },
+    onError: (error) => {
+      console.error('Error creating quiz:', error)
+    }
   })
 }
