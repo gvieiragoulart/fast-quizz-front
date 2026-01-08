@@ -32,9 +32,8 @@ import {
   Save as SaveIcon,
   HelpOutline as HelpIcon,
 } from '@mui/icons-material';
-import type{ Quiz, Question, QuestionOption } from '../types';
+import type{ Question } from '../types';
 import { useCreateQuiz } from '../hooks/useApi';
-import { Navigate } from 'react-router-dom';
 
 const CreateQuizPage: React.FC = () => {
    const navigate = useNavigate();

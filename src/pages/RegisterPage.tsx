@@ -2,7 +2,6 @@ import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
 import { useRegister } from '../hooks/useApi'
-import { useAuth } from '../hooks/useAuth'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
@@ -16,18 +15,17 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
   const navigate = useNavigate()
-  const { login: setAuth } = useAuth()
   const registerMutation = useRegister()
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     try {
-      const response = await registerMutation.mutateAsync({
+      await registerMutation.mutateAsync({
         email,
         password,
         name: name.trim() || undefined,
       })
-      setAuth(response.token)
+
       navigate('/')
     } catch (error) {
       console.error('Registration failed:', error)

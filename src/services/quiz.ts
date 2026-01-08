@@ -1,5 +1,4 @@
 import api from './api';
-import { authService } from './auth';
 import type { Question, SubmitQuizRequest, QuizResult, QuizListResponse } from '../types';
 
 export const quizService = {

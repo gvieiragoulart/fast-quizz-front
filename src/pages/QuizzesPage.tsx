@@ -1,6 +1,5 @@
 import { useNavigate } from 'react-router-dom'
 import { useQuizzes } from '../hooks/useApi'
-import { useAuth } from '../hooks/useAuth'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import Box from '@mui/material/Box'

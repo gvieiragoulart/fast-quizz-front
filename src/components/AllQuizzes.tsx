@@ -56,9 +56,7 @@ const AllQuizzes: React.FC<AllQuizzesProps> = ({
     return null;
   }
 
-  const filteredQuizzes = quizzes.filter((quiz) => {
-    return true;
-  });
+  const filteredQuizzes = quizzes
 
   const handleCategoryChange = (event: SelectChangeEvent) => {
     setFilterCategory(event.target.value);
