@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authService } from '../services/auth';
 import { quizService } from '../services/quiz';
-import type { LoginRequest, RegisterRequest, SubmitQuizRequest } from '../types';
+import type { LoginRequest, RegisterRequest, SubmitQuizRequest, QuizRequestCreate } from '../types';
 
 export const useLogin = () => {
   const queryClient = useQueryClient();
@@ -55,7 +55,7 @@ export const useCreateQuiz = () => {
   const queryClient = useQueryClient()
 
   return useMutation({
-    mutationFn: (payload: { title: string; description?: string; questions: Array<{ text: string;  correct_answer: string; options: Array<{ text: string; is_correct?: boolean }> }> }) => quizService.createQuiz(payload),
+    mutationFn: (payload: QuizRequestCreate) => quizService.createQuiz(payload),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['quizzes'] })
     },

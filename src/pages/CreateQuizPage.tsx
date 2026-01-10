@@ -43,10 +43,10 @@ const CreateQuizPage: React.FC = () => {
     {
       text: '',
       options: [
-        { id: '1', text: '', order: 0, is_correct: true },
-        { id: '2', text: '', order: 1, is_correct: false },
-        { id: '3', text: '', order: 2, is_correct: false },
-        { id: '4', text: '', order: 3, is_correct: false },
+        { reference_id: 1, id: '1', text: '', order: 0, is_correct: true },
+        { reference_id: 2, id: '2', text: '', order: 1, is_correct: false },
+        { reference_id: 3, id: '3', text: '', order: 2, is_correct: false },
+        { reference_id: 4, id: '4', text: '', order: 3, is_correct: false },
       ],
     },
   ]);
@@ -76,11 +76,12 @@ const CreateQuizPage: React.FC = () => {
   const addQuestion = () => {
     const newQuestion: Partial<Question> = {
       text: '',
+      correct_answer: 1,
       options: [
-        { id: Math.random().toString(), text: '', order: 0, is_correct: true },
-        { id: Math.random().toString(), text: '', order: 1, is_correct: false },
-        { id: Math.random().toString(), text: '', order: 2, is_correct: false },
-        { id: Math.random().toString(), text: '', order: 3, is_correct: false },
+        { id: Math.random().toString(), reference_id: 1, text: '', order: 0, is_correct: true },
+        { id: Math.random().toString(), reference_id: 2, text: '', order: 1, is_correct: false },
+        { id: Math.random().toString(), reference_id: 3, text: '', order: 2, is_correct: false },
+        { id: Math.random().toString(), reference_id: 4, text: '', order: 3, is_correct: false },
       ],
     };
     setQuestions([...questions, newQuestion]);
@@ -120,7 +121,12 @@ const CreateQuizPage: React.FC = () => {
 
     if (newQuestions[activeStep].options) {
       const correctOption = newQuestions[activeStep].options!.find(opt => opt.is_correct);
-      newQuestions[activeStep].correct_answer = correctOption ? correctOption.text : '';
+      if (!correctOption) {
+        setError('Por favor, selecione uma opção correta.');
+        return;
+      }
+      newQuestions[activeStep].correct_answer = correctOption.reference_id;
+      console.log("Questões atualizadas:", newQuestions);
     }
     setQuestions(newQuestions);
   };
@@ -183,13 +189,19 @@ const CreateQuizPage: React.FC = () => {
       description: quizDescription,
       questions: questions,
     });
+
+
     createQuiz({
       title: quizTitle,
       description: quizDescription,
       questions: questions as Array<{
         text: string;
-        correct_answer: string;
-        options: Array<{ text: string; is_correct?: boolean }>;
+        correct_answer: number;
+        options: Array<{ 
+          reference_id: number; 
+          is_correct?: boolean, 
+          text: string
+        }>;
       }>,
     });
 

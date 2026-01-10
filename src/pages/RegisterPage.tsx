@@ -1,7 +1,8 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { Link as RouterLink, useNavigate } from 'react-router-dom'
-import { useRegister } from '../hooks/useApi'
+import { useRegister, useLogin } from '../hooks/useApi'
+import { useAuth } from '../hooks/useAuth'
 import Container from '@mui/material/Container'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
@@ -14,8 +15,11 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [name, setName] = useState('')
+  const [username, setUsername] = useState('')
   const navigate = useNavigate()
   const registerMutation = useRegister()
+  const loginMutation = useLogin()
+  const { login: setAuth } = useAuth()
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
@@ -24,7 +28,17 @@ export default function RegisterPage() {
         email,
         password,
         name: name.trim() || undefined,
+        username,
       })
+
+      const response = await loginMutation.mutateAsync({
+        email,
+        password,
+      })
+
+      setAuth(response.access_token)
+
+
 
       navigate('/')
     } catch (error) {
@@ -49,6 +63,18 @@ export default function RegisterPage() {
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
+              sx={{ mb: 2 }}
+            />
+
+            <TextField
+              label="Usuario"
+              id="username"
+              name="username"
+              type="text"
+              fullWidth
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Your username"
               sx={{ mb: 2 }}
             />
 

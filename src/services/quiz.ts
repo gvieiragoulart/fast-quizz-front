@@ -1,5 +1,5 @@
 import api from './api';
-import type { Question, SubmitQuizRequest, QuizResult, QuizListResponse } from '../types';
+import type { Question, SubmitQuizRequest, QuizResult, QuizListResponse, QuizRequestCreate, Quiz } from '../types';
 
 export const quizService = {
   async getQuizzes(): Promise<QuizListResponse> {
@@ -39,7 +39,7 @@ export const quizService = {
       return response.data;
     }
   },
-  async createQuiz(payload: { title: string; description?: string; questions: Array<{ text: string; correct_answer: string; options: Array<{ text: string; is_correct?: boolean }> }> }) {
+  async createQuiz(payload: QuizRequestCreate): Promise<Quiz> {
     try {
       const response = await api.post('/api/quizzes', payload);
       return response.data;

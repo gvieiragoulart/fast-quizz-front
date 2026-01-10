@@ -17,6 +17,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   name?: string;
+  username: string;
 }
 
 export interface RegisterResponse {
@@ -32,6 +33,24 @@ export interface Quiz {
   createdAt?: string;
 }
 
+export interface QuizRequestCreate {
+  title: string;
+  description: string;
+  questions: Array<QuestionQuizCreate>;
+}
+
+export interface QuestionQuizCreate {
+  text: string;
+  correct_answer: number;
+  options: Array<OptionQuestionCreate>;
+}
+
+export interface OptionQuestionCreate {
+  reference_id: number;
+  text: string;
+  is_correct?: boolean;
+}
+
 export interface QuizListResponse {
   items: Quiz[];
   total_items: number;
@@ -40,6 +59,7 @@ export interface QuizListResponse {
 
 export interface QuestionOption {
   id: string;
+  reference_id: number;
   text: string;
   order: number;
   is_correct?: boolean;
@@ -50,7 +70,7 @@ export interface Question {
   text: string;
   quiz_id: string;
   options: QuestionOption[];
-  correct_answer?: string;
+  correct_answer: number;
 }
 
 export interface Answer {
