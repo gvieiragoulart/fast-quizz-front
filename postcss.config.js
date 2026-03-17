@@ -1,3 +1,6 @@
-// PostCSS config removed during migration to MUI.
-// You can delete this file after verifying the migration.
-
+export default {
+  plugins: {
+    '@tailwindcss/postcss': {},
+    autoprefixer: {},
+  },
+}

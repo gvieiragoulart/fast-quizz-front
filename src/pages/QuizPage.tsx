@@ -1,18 +1,13 @@
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { useQuizQuestions, useSubmitQuiz } from '../hooks/useApi'
-import type { Answer, Question, QuestionOption, QuizResult } from '../types'
-import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
-import Box from '@mui/material/Box'
-import Container from '@mui/material/Container'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import LinearProgress from '@mui/material/LinearProgress'
-import Grid from '@mui/material/Grid'
-import CircularProgress from '@mui/material/CircularProgress'
-import Alert from '@mui/material/Alert'
-import CheckIcon from '@mui/icons-material/Check'
+import { useQuizQuestions, useSubmitQuiz } from '@/hooks/useApi'
+import type { Answer, Question, QuestionOption, QuizResult } from '@/types'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Progress } from '@/components/ui/progress'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Check, Loader2 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 export default function QuizPage() {
   const { quizId } = useParams<{ quizId: string }>()
@@ -26,17 +21,8 @@ export default function QuizPage() {
 
   const handleSelectOption = (optionIndex: number) => {
     if (!currentQuestion) return
-
     const newAnswers = answers.filter((a) => a.questionId !== currentQuestion.id)
-    newAnswers.push({
-      questionId: currentQuestion.id,
-      selectedOption: optionIndex,
-    })
-
-    if (currentQuestion.options[optionIndex]?.is_correct) {
-      console.log('Selected correct option:', currentQuestion.options[optionIndex])
-    }
-    
+    newAnswers.push({ questionId: currentQuestion.id, selectedOption: optionIndex })
     setAnswers(newAnswers)
   }
 
@@ -47,16 +33,13 @@ export default function QuizPage() {
   }
 
   const handlePrevious = () => {
-    if (currentQuestionIndex > 0) {
-      setCurrentQuestionIndex((i) => i - 1)
-    }
+    if (currentQuestionIndex > 0) setCurrentQuestionIndex((i) => i - 1)
   }
 
   const handleSubmit = async () => {
     if (!quizId || !questions) return
-
     if (answers.length !== questions.length) {
-      alert('Please answer all questions before submitting.')
+      alert('Por favor, responda todas as questões antes de enviar.')
       return
     }
 
@@ -67,7 +50,6 @@ export default function QuizPage() {
         const selectedOption = question?.options[selectedOptionIndex]
         const correctOptionIndex = question?.options.findIndex((opt) => opt.is_correct) ?? -1
         const isCorrect = selectedOption?.is_correct === true
-
         return {
           questionId: a.questionId,
           question: question?.text ?? '',
@@ -89,7 +71,6 @@ export default function QuizPage() {
         answers: detailedAnswers,
       }
 
-      // Attempt to submit to API; if API returns a result use it, otherwise fallback to localResult
       let apiResult: QuizResult | undefined
       try {
         const response = await submitQuiz.mutateAsync({ quizId, answers })
@@ -97,13 +78,13 @@ export default function QuizPage() {
           apiResult = response as QuizResult
         }
       } catch (err) {
-        console.error('Submit API failed, will use local result:', err)
+        console.error('Submit API failed, using local result:', err)
       }
 
       navigate(`/quiz/${quizId}/results`, { state: { result: apiResult ?? localResult } })
     } catch (error) {
       console.error('Failed to submit quiz:', error)
-      alert('Failed to submit quiz. Please try again.')
+      alert('Falha ao enviar. Tente novamente.')
     }
   }
 
@@ -114,85 +95,99 @@ export default function QuizPage() {
 
   if (isLoading) {
     return (
-      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Box textAlign="center">
-          <CircularProgress />
-          <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>Loading quiz...</Typography>
-        </Box>
-      </Box>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Carregando quiz...</p>
+        </div>
+      </div>
     )
   }
 
   if (isError || !questions || questions.length === 0) {
     return (
-      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Box textAlign="center">
-          <Alert severity="error">Failed to load quiz. Please try again.</Alert>
-          <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={() => navigate('/')}>
-            Back to Quizzes
-          </Button>
-        </Box>
-      </Box>
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-center space-y-4">
+          <Alert variant="destructive" className="max-w-sm">
+            <AlertDescription>Falha ao carregar o quiz. Tente novamente.</AlertDescription>
+          </Alert>
+          <Button onClick={() => navigate('/')}>Voltar</Button>
+        </div>
+      </div>
     )
   }
 
   const currentAnswer = getCurrentAnswer()
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100
-  const isSubmitting = (submitQuiz as any).isPending || (submitQuiz as any).isLoading || false
+  const isSubmitting = (submitQuiz as any).isPending || false
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <Container maxWidth="md" sx={{ py: 6 }}>
-        <Box sx={{ mb: 4 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-            <Typography variant="body2">Question {currentQuestionIndex + 1} of {questions.length}</Typography>
-            <Typography variant="body2">{answers.length} answered</Typography>
-          </Box>
-          <LinearProgress variant="determinate" value={progress} sx={{ height: 8, borderRadius: 2 }} />
-        </Box>
+    <div className="min-h-screen bg-muted/30">
+      <div className="container mx-auto max-w-2xl px-4 py-10">
+        {/* Progress */}
+        <div className="mb-6 space-y-2">
+          <div className="flex justify-between text-sm text-muted-foreground">
+            <span>Questão {currentQuestionIndex + 1} de {questions.length}</span>
+            <span>{answers.length} respondidas</span>
+          </div>
+          <Progress value={progress} className="h-2" />
+        </div>
 
-        <Card sx={{ mb: 4 }}>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>{currentQuestion?.text}</Typography>
+        {/* Question card */}
+        <Card className="mb-6">
+          <CardContent className="pt-6 space-y-4">
+            <h2 className="text-lg font-semibold">{currentQuestion?.text}</h2>
 
-            <Grid container spacing={2}>
+            <div className="space-y-3">
               {currentQuestion?.options.map((option: QuestionOption, index: number) => {
                 const selected = currentAnswer?.selectedOption === index
                 return (
-                  <Grid item xs={12} key={option.id ?? index}>
-                    <Button
-                      onClick={() => handleSelectOption(index)}
-                      fullWidth
-                      variant={selected ? 'contained' : 'outlined'}
-                      color={selected ? 'primary' : 'inherit'}
-                      sx={{ justifyContent: 'flex-start', py: 2, textTransform: 'none' }}
-                      startIcon={selected ? <CheckIcon /> : undefined}
-                    >
-                      <Box sx={{ textAlign: 'left' }}>{option.text}</Box>
-                    </Button>
-                  </Grid>
+                  <button
+                    key={option.id ?? index}
+                    onClick={() => handleSelectOption(index)}
+                    className={cn(
+                      'w-full text-left px-4 py-3 rounded-lg border-2 text-sm font-medium transition-all flex items-center gap-3',
+                      selected
+                        ? 'border-primary bg-primary/10 text-primary'
+                        : 'border-input hover:border-primary/50 hover:bg-muted/50'
+                    )}
+                  >
+                    {selected && <Check className="w-4 h-4 shrink-0" />}
+                    <span>{option.text}</span>
+                  </button>
                 )
               })}
-            </Grid>
+            </div>
           </CardContent>
         </Card>
 
-        <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
-          <Button variant="outlined" onClick={handlePrevious} disabled={currentQuestionIndex === 0}>
-            Previous
+        {/* Navigation */}
+        <div className="flex justify-between">
+          <Button
+            variant="outline"
+            onClick={handlePrevious}
+            disabled={currentQuestionIndex === 0}
+          >
+            Anterior
           </Button>
 
           {currentQuestionIndex === questions.length - 1 ? (
-            <Button variant="contained" color="success" onClick={handleSubmit} disabled={isSubmitting}>
-              {isSubmitting ? 'Submitting...' : 'Submit Quiz'}
+            <Button
+              className="bg-emerald-600 hover:bg-emerald-700"
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? (
+                <><Loader2 className="mr-2 w-4 h-4 animate-spin" /> Enviando...</>
+              ) : (
+                'Finalizar Quiz'
+              )}
             </Button>
           ) : (
-            <Button variant="contained" color="primary" onClick={handleNext}>
-              Next
-            </Button>
+            <Button onClick={handleNext}>Próxima</Button>
           )}
-        </Box>
-      </Container>
-    </Box>
+        </div>
+      </div>
+    </div>
   )
 }

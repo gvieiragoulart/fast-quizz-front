@@ -1,28 +1,21 @@
-import React, { useState } from 'react';
-import { Box } from '@mui/material';
-import HeroSection from '../components/HeroSection';
-import RecentQuizzes from '../components/RecentQuizzes';
-import AllQuizzes from '../components/AllQuizzes';
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useQuizzes } from '../hooks/useApi'
+import { useQuizzes } from '@/hooks/useApi'
+import HeroSection from '@/components/organisms/HeroSection'
+import RecentQuizzes from '@/components/organisms/RecentQuizzes'
+import AllQuizzes from '@/components/organisms/AllQuizzes'
 
-const HomePage: React.FC = () => {
-  const navigate = useNavigate();
-  const [filterCategory, setFilterCategory] = useState<string>('all');
-  const [filterDifficulty, setFilterDifficulty] = useState<string>('all');
-  const { data: quizzes, isLoading, isError } = useQuizzes();
+export default function HomePage() {
+  const navigate = useNavigate()
+  const [filterCategory, setFilterCategory] = useState('all')
+  const [filterDifficulty, setFilterDifficulty] = useState('all')
+  const { data: quizzes, isLoading, isError } = useQuizzes()
 
-
-  const handleCreateQuiz = () => {
-    navigate('/create');
-  };
-
-  const handleStartQuiz = (quizId: number | string) => {
-    navigate(`/quiz/${quizId}`);
-  };
+  const handleCreateQuiz = () => navigate('/create')
+  const handleStartQuiz = (quizId: number | string) => navigate(`/quiz/${quizId}`)
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5' }}>
+    <div className="min-h-screen bg-muted/30">
       <HeroSection onCreateQuiz={handleCreateQuiz} />
       <RecentQuizzes quizzes={quizzes?.items} onStartQuiz={handleStartQuiz} />
       <AllQuizzes
@@ -35,8 +28,6 @@ const HomePage: React.FC = () => {
         filterDifficulty={filterDifficulty}
         setFilterDifficulty={setFilterDifficulty}
       />
-    </Box>
-  );
-};
-
-export default HomePage;
+    </div>
+  )
+}

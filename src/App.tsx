@@ -1,11 +1,11 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthProvider } from './hooks/useAuth';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { AuthProvider } from './hooks/useAuth'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import QuizPage from './pages/QuizPage'
 import ResultsPage from './pages/ResultsPage'
-import MainLayout from './components/MainLayout'
+import MainLayout from './components/templates/MainLayout'
 import ProtectedRoute from './components/ProtectedRoute'
 import CreateQuizPage from './pages/CreateQuizPage'
 import HomePage from './pages/HomePage'
@@ -17,7 +17,7 @@ const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
     },
   },
-});
+})
 
 function App() {
   return (
@@ -37,7 +37,7 @@ function App() {
         </Router>
       </AuthProvider>
     </QueryClientProvider>
-  );
+  )
 }
 
-export default App;
+export default App

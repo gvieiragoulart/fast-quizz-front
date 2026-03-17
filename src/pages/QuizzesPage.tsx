@@ -1,80 +1,67 @@
 import { useNavigate } from 'react-router-dom'
-import { useQuizzes } from '../hooks/useApi'
-import Typography from '@mui/material/Typography'
-import Button from '@mui/material/Button'
-import Box from '@mui/material/Box'
-import Container from '@mui/material/Container'
-import Grid from '@mui/material/Grid'
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import CircularProgress from '@mui/material/CircularProgress'
-import Alert from '@mui/material/Alert'
+import { useQuizzes } from '@/hooks/useApi'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Loader2 } from 'lucide-react'
 
 export default function QuizzesPage() {
   const navigate = useNavigate()
   const { data: quizzes, isLoading, isError } = useQuizzes()
 
-  const handleStartQuiz = (quizId: string) => {
-    navigate(`/quiz/${quizId}`)
-  }
+  const handleStartQuiz = (quizId: string) => navigate(`/quiz/${quizId}`)
 
   if (isLoading) {
     return (
-      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Box textAlign="center">
-          <CircularProgress />
-          <Typography variant="body2" sx={{ mt: 2, color: 'text.secondary' }}>Loading quizzes...</Typography>
-        </Box>
-      </Box>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-muted-foreground">Carregando quizzes...</p>
+        </div>
+      </div>
     )
   }
 
   if (isError) {
     return (
-      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Box textAlign="center">
-          <Alert severity="error">Failed to load quizzes. Please try again.</Alert>
-          <Button variant="contained" color="primary" sx={{ mt: 2 }} onClick={() => window.location.reload()}>
-            Retry
-          </Button>
-        </Box>
-      </Box>
+      <div className="min-h-screen flex items-center justify-center px-4">
+        <div className="text-center space-y-4">
+          <Alert variant="destructive" className="max-w-sm">
+            <AlertDescription>Falha ao carregar quizzes. Tente novamente.</AlertDescription>
+          </Alert>
+          <Button onClick={() => window.location.reload()}>Tentar Novamente</Button>
+        </div>
+      </div>
     )
   }
 
   return (
-    <Box sx={{ minHeight: '100vh' }}>
-      <Container maxWidth="lg" sx={{ py: 6 }}>
-        <Box sx={{ mb: 4 }}>
-          <Typography variant="h5" component="h2" gutterBottom>
-            Available Quizzes
-          </Typography>
-        </Box>
+    <div className="min-h-screen">
+      <div className="container mx-auto px-4 py-10">
+        <h2 className="text-xl font-semibold mb-6">Quizzes Disponíveis</h2>
 
         {quizzes && quizzes.items.length === 0 ? (
-          <Box textAlign="center" sx={{ py: 6 }}>
-            <Typography color="text.secondary">No quizzes available at the moment.</Typography>
-          </Box>
+          <div className="text-center py-16">
+            <p className="text-muted-foreground">Nenhum quiz disponível no momento.</p>
+          </div>
         ) : (
-          <Grid container spacing={3}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {quizzes?.items.map((quiz) => (
-              <Grid item xs={12} sm={6} md={4} key={quiz.id}>
-                <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
-                  <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography variant="h6" gutterBottom>{quiz.title}</Typography>
-                    {quiz.description && (
-                      <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>{quiz.description}</Typography>
-                    )}
-                    <Button fullWidth variant="contained" color="primary" onClick={() => handleStartQuiz(quiz.id)}>
-                      Start Quiz
-                    </Button>
-                  </CardContent>
-                </Card>
-              </Grid>
+              <Card key={quiz.id} className="h-full flex flex-col">
+                <CardContent className="flex-1 pt-6">
+                  <h3 className="font-semibold text-lg mb-2">{quiz.title}</h3>
+                  {quiz.description && (
+                    <p className="text-muted-foreground text-sm mb-4">{quiz.description}</p>
+                  )}
+                  <Button className="w-full" onClick={() => handleStartQuiz(quiz.id)}>
+                    Iniciar Quiz
+                  </Button>
+                </CardContent>
+              </Card>
             ))}
-          </Grid>
+          </div>
         )}
-      </Container>
-    </Box>
+      </div>
+    </div>
   )
 }

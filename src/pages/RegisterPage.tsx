@@ -1,15 +1,13 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import { Link as RouterLink, useNavigate } from 'react-router-dom'
-import { useRegister, useLogin } from '../hooks/useApi'
-import { useAuth } from '../hooks/useAuth'
-import Container from '@mui/material/Container'
-import Box from '@mui/material/Box'
-import Typography from '@mui/material/Typography'
-import TextField from '@mui/material/TextField'
-import Button from '@mui/material/Button'
-import Alert from '@mui/material/Alert'
-import Link from '@mui/material/Link'
+import { Link, useNavigate } from 'react-router-dom'
+import { useRegister, useLogin } from '@/hooks/useApi'
+import { useAuth } from '@/hooks/useAuth'
+import { Button } from '@/components/ui/button'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import FormField from '@/components/molecules/FormField'
+import { AlertCircle, Zap } from 'lucide-react'
 
 export default function RegisterPage() {
   const [email, setEmail] = useState('')
@@ -30,16 +28,8 @@ export default function RegisterPage() {
         name: name.trim() || undefined,
         username,
       })
-
-      const response = await loginMutation.mutateAsync({
-        email,
-        password,
-      })
-
+      const response = await loginMutation.mutateAsync({ email, password })
       setAuth(response.access_token)
-
-
-
       navigate('/')
     } catch (error) {
       console.error('Registration failed:', error)
@@ -47,82 +37,89 @@ export default function RegisterPage() {
   }
 
   return (
-    <Container maxWidth="sm">
-      <Box sx={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Box sx={{ width: '100%', bgcolor: 'background.paper', p: 4, borderRadius: 2, boxShadow: 1 }}>
-          <Typography variant="h4" align="center">Fast Quiz</Typography>
-          <Typography variant="body2" align="center" color="text.secondary" sx={{ mt: 1 }}>Create your account</Typography>
+    <div className="min-h-screen flex items-center justify-center bg-muted/30 px-4">
+      <Card className="w-full max-w-sm shadow-md">
+        <CardHeader className="text-center">
+          <div className="flex justify-center mb-2">
+            <Zap className="w-8 h-8 text-blue-600" />
+          </div>
+          <CardTitle className="text-2xl">Fast Quiz</CardTitle>
+          <CardDescription>Crie sua conta</CardDescription>
+        </CardHeader>
 
-          <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-            <TextField
-              label="Name (optional)"
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <FormField
               id="name"
-              name="name"
+              label="Nome (opcional)"
               type="text"
-              fullWidth
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Your name"
-              sx={{ mb: 2 }}
+              placeholder="Seu nome"
             />
 
-            <TextField
-              label="Usuario"
+            <FormField
               id="username"
-              name="username"
+              label="Usuário"
               type="text"
-              fullWidth
+              required
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              placeholder="Your username"
-              sx={{ mb: 2 }}
+              placeholder="seu_usuario"
             />
 
-            <TextField
-              label="Email address"
+            <FormField
               id="email"
-              name="email"
+              label="Email"
               type="email"
+              name="email"
               autoComplete="email"
               required
-              fullWidth
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              placeholder="your@email.com"
-              sx={{ mb: 2 }}
+              placeholder="seu@email.com"
             />
 
-            <TextField
-              label="Password"
+            <FormField
               id="password"
-              name="password"
+              label="Senha"
               type="password"
+              name="password"
               autoComplete="new-password"
               required
-              fullWidth
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="••••••••"
-              sx={{ mb: 2 }}
             />
 
             {registerMutation.isError && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                Registration failed. {registerMutation.error instanceof Error ? registerMutation.error.message : 'Please try again.'}
+              <Alert variant="destructive">
+                <AlertCircle className="h-4 w-4" />
+                <AlertDescription>
+                  {registerMutation.error instanceof Error
+                    ? registerMutation.error.message
+                    : 'Tente novamente.'}
+                </AlertDescription>
               </Alert>
             )}
 
-            <Button type="submit" variant="contained" fullWidth disabled={(registerMutation as any).isPending}>
-              {(registerMutation as any).isPending ? 'Creating account...' : 'Create account'}
+            <Button
+              type="submit"
+              className="w-full"
+              disabled={(registerMutation as any).isPending}
+            >
+              {(registerMutation as any).isPending ? 'Criando conta...' : 'Criar conta'}
             </Button>
 
-            <Typography align="center" sx={{ mt: 2 }}>
-              Already have an account?{' '}
-              <Link component={RouterLink} to="/login">Sign in</Link>
-            </Typography>
-          </Box>
-        </Box>
-      </Box>
-    </Container>
+            <p className="text-center text-sm text-muted-foreground">
+              Já tem uma conta?{' '}
+              <Link to="/login" className="text-primary hover:underline font-medium">
+                Entrar
+              </Link>
+            </p>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
   )
 }

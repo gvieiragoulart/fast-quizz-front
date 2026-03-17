@@ -1,44 +1,28 @@
-import React, { useState } from 'react';
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { Plus, Trash2, ChevronLeft, ChevronRight, Upload, Save, HelpCircle } from 'lucide-react'
+import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { Textarea } from '@/components/ui/textarea'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
+import { Separator } from '@/components/ui/separator'
 import {
-  Box,
-  Container,
-  Typography,
-  TextField,
-  Button,
-  Paper,
-  IconButton,
-  Grid,
-  MobileStepper,
   Dialog,
-  DialogTitle,
   DialogContent,
-  DialogActions,
-  Divider,
-  Radio,
-  RadioGroup,
-  FormControlLabel,
-  FormControl,
-  Tooltip,
-  Alert,
-  Snackbar,
-} from '@mui/material';
-import {
-  Add as AddIcon,
-  Delete as DeleteIcon,
-  KeyboardArrowLeft,
-  KeyboardArrowRight,
-  CloudUpload as UploadIcon,
-  Save as SaveIcon,
-  HelpOutline as HelpIcon,
-} from '@mui/icons-material';
-import type{ Question } from '../types';
-import { useCreateQuiz } from '../hooks/useApi';
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import { Alert, AlertDescription } from '@/components/ui/alert'
+import type { Question } from '@/types'
+import { useCreateQuiz } from '@/hooks/useApi'
 
-const CreateQuizPage: React.FC = () => {
-   const navigate = useNavigate();
-  const [quizTitle, setQuizTitle] = useState('');
-  const [quizDescription, setQuizDescription] = useState('');
+export default function CreateQuizPage() {
+  const navigate = useNavigate()
+  const [quizTitle, setQuizTitle] = useState('')
+  const [quizDescription, setQuizDescription] = useState('')
   const [questions, setQuestions] = useState<Partial<Question>[]>([
     {
       text: '',
@@ -49,30 +33,17 @@ const CreateQuizPage: React.FC = () => {
         { reference_id: 4, id: '4', text: '', order: 3, is_correct: false },
       ],
     },
-  ]);
-  const { mutate: createQuiz, isError } = useCreateQuiz();
-  
+  ])
+  const { mutate: createQuiz, isError } = useCreateQuiz()
 
-  // Estados para o Carrossel
-  const [activeStep, setActiveStep] = useState(0);
-  const maxSteps = questions.length;
+  const [activeStep, setActiveStep] = useState(0)
+  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
+  const [jsonInput, setJsonInput] = useState('')
+  const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
-  // Estados para Importação JSON
-  const [isImportDialogOpen, setIsImportDialogOpen] = useState(false);
-  const [jsonInput, setJsonInput] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const maxSteps = questions.length
 
-  // Handlers do Carrossel
-  const handleNext = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevActiveStep) => prevActiveStep - 1);
-  };
-
-  // Handlers de Pergunta
   const addQuestion = () => {
     const newQuestion: Partial<Question> = {
       text: '',
@@ -83,362 +54,302 @@ const CreateQuizPage: React.FC = () => {
         { id: Math.random().toString(), reference_id: 3, text: '', order: 2, is_correct: false },
         { id: Math.random().toString(), reference_id: 4, text: '', order: 3, is_correct: false },
       ],
-    };
-    setQuestions([...questions, newQuestion]);
-    setActiveStep(questions.length);
-  };
+    }
+    setQuestions([...questions, newQuestion])
+    setActiveStep(questions.length)
+  }
 
   const removeQuestion = (index: number) => {
-    if (questions.length === 1) return;
-    const newQuestions = questions.filter((_, i) => i !== index);
-    setQuestions(newQuestions);
-    if (activeStep >= newQuestions.length) {
-      setActiveStep(newQuestions.length - 1);
-    }
-  };
+    if (questions.length === 1) return
+    const newQuestions = questions.filter((_, i) => i !== index)
+    setQuestions(newQuestions)
+    if (activeStep >= newQuestions.length) setActiveStep(newQuestions.length - 1)
+  }
 
   const updateQuestionText = (text: string) => {
-    const newQuestions = [...questions];
-    newQuestions[activeStep].text = text;
-    setQuestions(newQuestions);
-  };
+    const newQuestions = [...questions]
+    newQuestions[activeStep].text = text
+    setQuestions(newQuestions)
+  }
 
   const updateOptionText = (optionIndex: number, text: string) => {
-    const newQuestions = [...questions];
+    const newQuestions = [...questions]
     if (newQuestions[activeStep].options) {
-      newQuestions[activeStep].options![optionIndex].text = text;
+      newQuestions[activeStep].options![optionIndex].text = text
     }
-    setQuestions(newQuestions);
-  };
+    setQuestions(newQuestions)
+  }
 
   const setCorrectOption = (optionIndex: number) => {
-    const newQuestions = [...questions];
+    const newQuestions = [...questions]
     if (newQuestions[activeStep].options) {
       newQuestions[activeStep].options!.forEach((opt, i) => {
-        opt.is_correct = i === optionIndex;
-      });
-    }
-
-    if (newQuestions[activeStep].options) {
-      const correctOption = newQuestions[activeStep].options!.find(opt => opt.is_correct);
-      if (!correctOption) {
-        setError('Por favor, selecione uma opção correta.');
-        return;
+        opt.is_correct = i === optionIndex
+      })
+      const correctOption = newQuestions[activeStep].options!.find((opt) => opt.is_correct)
+      if (correctOption) {
+        newQuestions[activeStep].correct_answer = correctOption.reference_id
       }
-      newQuestions[activeStep].correct_answer = correctOption.reference_id;
-      console.log("Questões atualizadas:", newQuestions);
     }
-    setQuestions(newQuestions);
-  };
+    setQuestions(newQuestions)
+  }
 
-  // Handler de Importação JSON
   const handleImportJson = () => {
     try {
-      const parsed = JSON.parse(jsonInput);
-      if (!Array.isArray(parsed)) {
-        throw new Error('O JSON deve ser um array de perguntas.');
-      }
+      const parsed = JSON.parse(jsonInput)
+      if (!Array.isArray(parsed)) throw new Error('O JSON deve ser um array de perguntas.')
 
       const importedQuestions: Partial<Question>[] = parsed.map((q: any) => {
-        // Lógica para identificar a resposta correta se vier como string separada
         const options = q.options.map((opt: any, index: number) => {
-          let isCorrect = opt.is_correct ?? false;
-          
-          // Se o JSON tiver "correct_answer" e bater com o texto da opção
-          if (q.correct_answer && opt.text === q.correct_answer) {
-            isCorrect = true;
-          }
-          
-          return {
-            id: Math.random().toString(),
-            text: opt.text || '',
+          let isCorrect = opt.is_correct ?? false
+          if (q.correct_answer && opt.text === q.correct_answer) isCorrect = true
+          return { 
+            id: Math.random().toString(), 
+            text: opt.text || '', 
             order: opt.order ?? index,
-            is_correct: isCorrect,
-          };
-        });
+            reference_id: opt.reference_id ?? index + 1, 
+            is_correct: isCorrect 
+          }
+        })
+        if (!options.some((opt: any) => opt.is_correct) && options.length > 0) options[0].is_correct = true
+        return { 
+          text: q.text, 
+          correct_answer: q.correct_answer || '', options }
+      })
 
-        // Garantir que pelo menos uma opção seja correta se nenhuma foi marcada
-        if (!options.some((opt: any) => opt.is_correct) && options.length > 0) {
-          options[0].is_correct = true;
-        }
-
-        return {
-          text: q.text || '',
-          options: options,
-        };
-      });
-
-      setQuestions(importedQuestions);
-      setActiveStep(0);
-      setIsImportDialogOpen(false);
-      setJsonInput('');
-      setSuccessMessage('Perguntas importadas com sucesso!');
+      setQuestions(importedQuestions)
+      setActiveStep(0)
+      setIsImportDialogOpen(false)
+      setJsonInput('')
+      setSuccessMessage('Perguntas importadas com sucesso!')
     } catch (err: any) {
-      setError('Erro ao processar JSON: ' + err.message);
+      setError('Erro ao processar JSON: ' + err.message)
     }
-  };
+  }
 
   const handleSaveQuiz = () => {
     if (!quizTitle) {
-      setError('Por favor, insira um título para o quiz.');
-      return;
+      setError('Por favor, insira um título para o quiz.')
+      return
     }
-    // Aqui você faria a chamada para sua API
-    console.log('Salvando Quiz:', {
-      title: quizTitle,
-      description: quizDescription,
-      questions: questions,
-    });
-
 
     createQuiz({
       title: quizTitle,
       description: quizDescription,
       questions: questions as Array<{
-        text: string;
-        correct_answer: number;
-        options: Array<{ 
-          reference_id: number; 
-          is_correct?: boolean, 
-          text: string
-        }>;
+        text: string
+        correct_answer: number
+        options: Array<{ reference_id: number; is_correct?: boolean; text: string }>
       }>,
-    });
+    })
 
     if (isError) {
-      setError('Erro ao salvar o quiz. Tente novamente.');
-      console.log("Erro ao salvar o quiz");
-      return;
+      setError('Erro ao salvar o quiz. Tente novamente.')
+      return
     }
 
-    // Resetar o formulário após salvar
-    setQuizTitle('');
-    setQuizDescription('');
-    setSuccessMessage('Quiz salvo com sucesso!');
-    navigate('/');
-  };
+    setQuizTitle('')
+    setQuizDescription('')
+    setSuccessMessage('Quiz salvo com sucesso!')
+    navigate('/')
+  }
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: '#f5f5f5', pb: 8 }}>
-      <Container maxWidth="md" sx={{ mt: 4 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-          <Typography variant="h4" sx={{ fontWeight: 'bold', color: '#2563eb' }}>
-            Criar Novo Quiz
-          </Typography>
-          <Box sx={{ display: 'flex', gap: 2 }}>
-            <Button
-              variant="outlined"
-              startIcon={<UploadIcon />}
-              onClick={() => setIsImportDialogOpen(true)}
-            >
+    <div className="min-h-screen bg-muted/30 pb-16">
+      <div className="container mx-auto max-w-3xl px-4 pt-8">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-blue-600">Criar Novo Quiz</h1>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={() => setIsImportDialogOpen(true)}>
+              <Upload className="mr-2 w-4 h-4" />
               Importar JSON
             </Button>
-            <Button
-              variant="contained"
-              startIcon={<SaveIcon />}
-              onClick={handleSaveQuiz}
-              sx={{ bgcolor: '#10b981', '&:hover': { bgcolor: '#059669' } }}
-            >
+            <Button className="bg-emerald-600 hover:bg-emerald-700" onClick={handleSaveQuiz}>
+              <Save className="mr-2 w-4 h-4" />
               Salvar Quiz
             </Button>
-          </Box>
-        </Box>
+          </div>
+        </div>
 
-        {/* Informações Básicas */}
-        <Paper sx={{ p: 3, mb: 4 }}>
-          <Typography variant="h6" sx={{ mb: 2, fontWeight: 'bold' }}>
-            Informações Básicas
-          </Typography>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Título do Quiz"
-                variant="outlined"
+        {/* Alerts */}
+        {error && (
+          <Alert variant="destructive" className="mb-4">
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+        {successMessage && (
+          <Alert className="mb-4 border-emerald-200 bg-emerald-50 text-emerald-800">
+            <AlertDescription>{successMessage}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Basic info */}
+        <Card className="mb-6">
+          <CardHeader>
+            <CardTitle className="text-base">Informações Básicas</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="space-y-1">
+              <Label htmlFor="quiz-title">Título do Quiz</Label>
+              <Input
+                id="quiz-title"
                 value={quizTitle}
                 onChange={(e) => setQuizTitle(e.target.value)}
                 placeholder="Ex: React Fundamentals"
               />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                fullWidth
-                label="Descrição"
-                variant="outlined"
-                multiline
+            </div>
+            <div className="space-y-1">
+              <Label htmlFor="quiz-desc">Descrição</Label>
+              <Textarea
+                id="quiz-desc"
                 rows={2}
                 value={quizDescription}
                 onChange={(e) => setQuizDescription(e.target.value)}
                 placeholder="Uma breve descrição sobre o que trata este quiz..."
               />
-            </Grid>
-          </Grid>
-        </Paper>
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Carrossel de Perguntas */}
-        <Paper sx={{ p: 3, position: 'relative' }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
-            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
-              Pergunta {activeStep + 1} de {maxSteps}
-            </Typography>
-            <Box>
-              <Tooltip title="Remover Pergunta">
-                <IconButton 
-                  color="error" 
+        {/* Questions carousel */}
+        <Card>
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <CardTitle className="text-base">
+                Pergunta {activeStep + 1} de {maxSteps}
+              </CardTitle>
+              <div className="flex gap-1">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-red-500 hover:text-red-600"
                   onClick={() => removeQuestion(activeStep)}
                   disabled={questions.length === 1}
+                  title="Remover Pergunta"
                 >
-                  <DeleteIcon />
-                </IconButton>
-              </Tooltip>
-              <Tooltip title="Adicionar Nova Pergunta">
-                <IconButton color="primary" onClick={addQuestion}>
-                  <AddIcon />
-                </IconButton>
-              </Tooltip>
-            </Box>
-          </Box>
+                  <Trash2 className="w-4 h-4" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="text-blue-600"
+                  onClick={addQuestion}
+                  title="Adicionar Pergunta"
+                >
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
 
-          <Divider sx={{ mb: 3 }} />
+          <Separator />
 
-          {/* Conteúdo da Pergunta Ativa */}
-          <Box sx={{ minHeight: 300 }}>
-            <TextField
-              fullWidth
-              label="Texto da Pergunta"
-              variant="filled"
-              multiline
-              rows={2}
-              value={questions[activeStep]?.text || ''}
-              onChange={(e) => updateQuestionText(e.target.value)}
-              sx={{ mb: 4 }}
-            />
+          <CardContent className="pt-6 space-y-6">
+            <div className="space-y-1">
+              <Label htmlFor="question-text">Texto da Pergunta</Label>
+              <Textarea
+                id="question-text"
+                rows={2}
+                value={questions[activeStep]?.text || ''}
+                onChange={(e) => updateQuestionText(e.target.value)}
+                placeholder="Digite a pergunta aqui..."
+              />
+            </div>
 
-            <Typography variant="subtitle1" sx={{ mb: 2, fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: 1 }}>
-              Opções de Resposta
-              <Tooltip title="Selecione a opção correta usando o botão de rádio">
-                <HelpIcon fontSize="small" color="action" />
-              </Tooltip>
-            </Typography>
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <Label>Opções de Resposta</Label>
+                <HelpCircle className="w-4 h-4 text-muted-foreground" aria-label="Selecione o botão de rádio na opção correta" />
+              </div>
 
-            <FormControl component="fieldset" sx={{ width: '100%' }}>
               <RadioGroup
-                value={questions[activeStep]?.options?.findIndex(opt => opt.is_correct).toString()}
-                onChange={(e) => setCorrectOption(parseInt(e.target.value))}
+                value={questions[activeStep]?.options?.findIndex((opt) => opt.is_correct).toString()}
+                onValueChange={(v) => setCorrectOption(parseInt(v))}
+                className="space-y-3"
               >
-                <Grid container spacing={2}>
-                  {questions[activeStep]?.options?.map((option, index) => (
-                    <Grid item xs={12} key={option.id}>
-                      <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                        <FormControlLabel
-                          value={index.toString()}
-                          control={<Radio color="success" />}
-                          label=""
-                          sx={{ mr: 0 }}
-                        />
-                        <TextField
-                          fullWidth
-                          size="small"
-                          label={`Opção ${index + 1}`}
-                          value={option.text}
-                          onChange={(e) => updateOptionText(index, e.target.value)}
-                          error={option.is_correct}
-                          color={option.is_correct ? "success" : "primary"}
-                        />
-                      </Box>
-                    </Grid>
-                  ))}
-                </Grid>
+                {questions[activeStep]?.options?.map((option, index) => (
+                  <div key={option.id} className="flex items-center gap-3">
+                    <RadioGroupItem
+                      value={index.toString()}
+                      id={`option-${index}`}
+                      className={option.is_correct ? 'text-emerald-600 border-emerald-600' : ''}
+                    />
+                    <Input
+                      className={`flex-1 ${option.is_correct ? 'border-emerald-400 ring-1 ring-emerald-300' : ''}`}
+                      placeholder={`Opção ${index + 1}`}
+                      value={option.text}
+                      onChange={(e) => updateOptionText(index, e.target.value)}
+                    />
+                  </div>
+                ))}
               </RadioGroup>
-            </FormControl>
-          </Box>
+            </div>
 
-          {/* Navegação do Carrossel */}
-          <MobileStepper
-            variant="dots"
-            steps={maxSteps}
-            position="static"
-            activeStep={activeStep}
-            sx={{ mt: 4, bgcolor: 'transparent' }}
-            nextButton={
+            {/* Stepper navigation */}
+            <div className="flex items-center justify-between pt-2">
               <Button
-                size="small"
-                onClick={handleNext}
+                variant="ghost"
+                size="sm"
+                onClick={() => setActiveStep((s) => s - 1)}
+                disabled={activeStep === 0}
+              >
+                <ChevronLeft className="w-4 h-4 mr-1" />
+                Anterior
+              </Button>
+
+              <div className="flex gap-1">
+                {questions.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setActiveStep(i)}
+                    className={`w-2 h-2 rounded-full transition-colors ${
+                      i === activeStep ? 'bg-primary' : 'bg-muted-foreground/30'
+                    }`}
+                  />
+                ))}
+              </div>
+
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setActiveStep((s) => s + 1)}
                 disabled={activeStep === maxSteps - 1}
               >
                 Próxima
-                <KeyboardArrowRight />
+                <ChevronRight className="w-4 h-4 ml-1" />
               </Button>
-            }
-            backButton={
-              <Button size="small" onClick={handleBack} disabled={activeStep === 0}>
-                <KeyboardArrowLeft />
-                Anterior
-              </Button>
-            }
-          />
-        </Paper>
-      </Container>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-      {/* Diálogo de Importação JSON */}
-      <Dialog 
-        open={isImportDialogOpen} 
-        onClose={() => setIsImportDialogOpen(false)}
-        fullWidth
-        maxWidth="sm"
-      >
-        <DialogTitle sx={{ fontWeight: 'bold' }}>Importar Perguntas via JSON</DialogTitle>
-        <DialogContent>
-          <Typography variant="body2" sx={{ mb: 2, color: 'text.secondary' }}>
+      {/* Import JSON Dialog */}
+      <Dialog open={isImportDialogOpen} onOpenChange={setIsImportDialogOpen}>
+        <DialogContent className="max-w-lg">
+          <DialogHeader>
+            <DialogTitle>Importar Perguntas via JSON</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground">
             Cole abaixo o array de perguntas no formato JSON. Cada objeto deve conter 'text' e um array de 'options'.
-          </Typography>
-          <TextField
-            fullWidth
-            multiline
+          </p>
+          <Textarea
             rows={10}
-            variant="outlined"
+            className="font-mono text-xs"
             placeholder='[ { "text": "Pergunta?", "options": [ { "text": "Opção 1", "is_correct": true }, ... ] } ]'
             value={jsonInput}
             onChange={(e) => setJsonInput(e.target.value)}
-            sx={{ fontFamily: 'monospace' }}
           />
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsImportDialogOpen(false)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleImportJson} disabled={!jsonInput}>
+              Importar Agora
+            </Button>
+          </DialogFooter>
         </DialogContent>
-        <DialogActions sx={{ p: 3 }}>
-          <Button onClick={() => setIsImportDialogOpen(false)}>Cancelar</Button>
-          <Button 
-            variant="contained" 
-            onClick={handleImportJson}
-            disabled={!jsonInput}
-          >
-            Importar Agora
-          </Button>
-        </DialogActions>
       </Dialog>
-
-      {/* Notificações */}
-      <Snackbar 
-        open={!!error} 
-        autoHideDuration={6000} 
-        onClose={() => setError(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert onClose={() => setError(null)} severity="error" sx={{ width: '100%' }}>
-          {error}
-        </Alert>
-      </Snackbar>
-
-      <Snackbar 
-        open={!!successMessage} 
-        autoHideDuration={4000} 
-        onClose={() => setSuccessMessage(null)}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert onClose={() => setSuccessMessage(null)} severity="success" sx={{ width: '100%' }}>
-          {successMessage}
-        </Alert>
-      </Snackbar>
-    </Box>
-  );
-};
-
-export default CreateQuizPage;
+    </div>
+  )
+}
