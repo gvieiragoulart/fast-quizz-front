@@ -2,6 +2,8 @@ export interface Quiz {
   id: string;
   title: string;
   description: string;
+  estimated_time?: number;
+  feedback_mode?: QuizFeedbackMode;
   questions?: Array<string>;
   createdAt?: string;
 }
@@ -12,9 +14,13 @@ export interface QuizListResponse {
   total_pages: number;
 }
 
+export type QuizFeedbackMode = 'final' | 'imediato'
+
 export interface QuizRequestCreate {
   title: string;
   description: string;
+  estimated_time?: number;
+  feedback_mode?: QuizFeedbackMode;
   questions: Array<QuestionQuizCreate>;
 }
 

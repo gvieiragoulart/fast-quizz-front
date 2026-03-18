@@ -29,12 +29,8 @@ export default function QuizCard({ quiz, onStartQuiz, showNewBadge = false }: Qu
 
         <div className="flex gap-4">
           <span className="flex items-center gap-1 text-sm text-muted-foreground">
-            <BookOpen className="w-4 h-4" />
-            {quiz.questions} questões
-          </span>
-          <span className="flex items-center gap-1 text-sm text-muted-foreground">
             <Clock className="w-4 h-4" />
-            2 min
+            {quiz.estimated_time || 'N/A'} min
           </span>
         </div>
       </CardContent>

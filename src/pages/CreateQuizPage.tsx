@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Trash2, ChevronLeft, ChevronRight, Upload, Save, HelpCircle } from 'lucide-react'
+import { Plus, Trash2, ChevronLeft, ChevronRight, Upload, Save, HelpCircle, Clock } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -8,6 +8,14 @@ import { Textarea } from '@/components/ui/textarea'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import { Separator } from '@/components/ui/separator'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+SelectValue,
+} from '@/components/ui/select'
+import type { QuizFeedbackMode } from '@/types'
 import {
   Dialog,
   DialogContent,
@@ -23,6 +31,8 @@ export default function CreateQuizPage() {
   const navigate = useNavigate()
   const [quizTitle, setQuizTitle] = useState('')
   const [quizDescription, setQuizDescription] = useState('')
+  const [estimatedTime, setEstimatedTime] = useState<number | ''>('')
+  const [feedbackMode, setFeedbackMode] = useState<QuizFeedbackMode>('final')
   const [questions, setQuestions] = useState<Partial<Question>[]>([
     {
       text: '',
@@ -136,6 +146,8 @@ export default function CreateQuizPage() {
     createQuiz({
       title: quizTitle,
       description: quizDescription,
+      estimated_time: estimatedTime !== '' ? estimatedTime : undefined,
+      feedback_mode: feedbackMode,
       questions: questions as Array<{
         text: string
         correct_answer: number
@@ -150,6 +162,8 @@ export default function CreateQuizPage() {
 
     setQuizTitle('')
     setQuizDescription('')
+    setEstimatedTime('')
+    setFeedbackMode('final')
     setSuccessMessage('Quiz salvo com sucesso!')
     navigate('/')
   }
@@ -208,6 +222,51 @@ export default function CreateQuizPage() {
                 onChange={(e) => setQuizDescription(e.target.value)}
                 placeholder="Uma breve descrição sobre o que trata este quiz..."
               />
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <Label htmlFor="quiz-time">Duração estimada</Label>
+                <div className="relative">
+                  <Clock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+                  <Input
+                    id="quiz-time"
+                    type="number"
+                    min={1}
+                    className="pl-9"
+                    value={estimatedTime}
+                    onChange={(e) =>
+                      setEstimatedTime(e.target.value === '' ? '' : Number(e.target.value))
+                    }
+                    placeholder="Ex: 10"
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">minutos</p>
+              </div>
+              <div className="space-y-1">
+                <Label htmlFor="quiz-feedback">Modo de feedback</Label>
+                <Select
+                  value={feedbackMode}
+                  onValueChange={(v) => setFeedbackMode(v as QuizFeedbackMode)}
+                >
+                  <SelectTrigger id="quiz-feedback">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="final">
+                      <div>
+                        <p className="font-medium">Resumo Final</p>
+                        <p className="text-xs text-muted-foreground">Feedback ao terminar o quiz</p>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="imediato">
+                      <div>
+                        <p className="font-medium">Resposta Imediata</p>
+                        <p className="text-xs text-muted-foreground">Feedback após cada resposta</p>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </CardContent>
         </Card>
