@@ -1,193 +1,145 @@
-# Fast Quiz Front
+# ⚡ Fast Quiz
 
-A React + TypeScript quiz application built with Vite, featuring JWT authentication, quiz management, and real-time quiz taking capabilities.
+Plataforma moderna para **criar, compartilhar e responder quizzes** de forma rápida e intuitiva. Construída com React, TypeScript e shadcn/ui seguindo Atomic Design.
 
-## Features
+## Screenshots
 
-- **JWT Authentication**: Secure login using JWT tokens
-- **Quiz Management**: Browse available quizzes
-- **Interactive Quiz Taking**: Answer questions with a clean, intuitive UI
-- **Real-time Progress Tracking**: See your progress as you take quizzes
-- **Results Display**: View detailed results with correct/incorrect answers
-- **Responsive Design**: Works seamlessly on desktop and mobile devices
+### Página Inicial
+![Página Inicial](docs/screenshots/home.png)
+
+### Criar Quiz
+![Criar Quiz](docs/screenshots/create-quiz.png)
 
 ## Tech Stack
 
-- **React 19** - UI library
-- **TypeScript** - Type safety
-- **Vite** - Build tool and dev server
-- **React Router** - Client-side routing
-- **TanStack Query (React Query)** - Data fetching and caching
-- **Axios** - HTTP client
-- **Tailwind CSS** - Utility-first CSS framework
-- **Vitest** - Unit testing framework
-- **Testing Library** - React component testing
+| Camada | Tecnologia |
+|--------|-----------|
+| UI | React 19 + TypeScript |
+| Estilização | Tailwind CSS v4 + shadcn/ui |
+| Build | Vite 7 |
+| Roteamento | React Router v7 |
+| Data fetching | TanStack Query (React Query) |
+| HTTP | Axios |
+| Testes | Vitest + Testing Library |
+| Deploy | AWS S3 (via GitHub Actions) |
 
-## Prerequisites
+## Funcionalidades
 
-- Node.js 18+ and npm
+- **Autenticação JWT** — login seguro com token armazenado no localStorage
+- **Explorar Quizzes** — navegue pelos quizzes disponíveis na plataforma
+- **Criar Quiz** — crie quizzes personalizados com múltipla escolha e importação via JSON
+- **Meus Quizzes** — gerencie os quizzes que você criou
+- **Responder Quiz** — interface intuitiva com navegação por questões e progresso em tempo real
+- **Resultados** — veja sua pontuação, ranking e resultados da comunidade
+- **Design Responsivo** — funciona em desktop e mobile
 
-## Installation
+## Estrutura do Projeto (Atomic Design)
 
-1. Clone the repository:
+```
+src/
+├── components/
+│   ├── ui/              # Atoms — componentes base (shadcn/ui)
+│   │   ├── button.tsx
+│   │   ├── input.tsx
+│   │   ├── card.tsx
+│   │   ├── badge.tsx
+│   │   ├── dialog.tsx
+│   │   └── ...
+│   ├── molecules/       # Compostos de atoms
+│   │   ├── FormField.tsx
+│   │   └── QuizCard.tsx
+│   ├── organisms/       # Seções complexas
+│   │   ├── Navbar.tsx
+│   │   ├── HeroSection.tsx
+│   │   ├── AllQuizzes.tsx
+│   │   └── RecentQuizzes.tsx
+│   └── templates/       # Layouts de página
+│       └── MainLayout.tsx
+├── pages/               # Rotas
+│   ├── HomePage.tsx
+│   ├── LoginPage.tsx
+│   ├── RegisterPage.tsx
+│   ├── CreateQuizPage.tsx
+│   ├── QuizzesPage.tsx
+│   ├── QuizPage.tsx
+│   └── ResultsPage.tsx
+├── hooks/               # Custom hooks
+├── services/            # Camada de API
+├── types/               # Tipos TypeScript
+└── lib/
+    └── utils.ts         # cn() helper
+```
+
+## Pré-requisitos
+
+- Node.js 20.19+ ou 22.12+
+- npm
+
+## Instalação
+
 ```bash
 git clone https://github.com/gvieiragoulart/fast-quizz-front.git
 cd fast-quizz-front
-```
-
-2. Install dependencies:
-```bash
 npm install
 ```
 
-3. Create a `.env` file based on `.env.example`:
+Crie o arquivo `.env`:
+
 ```bash
 cp .env.example .env
 ```
 
-4. Update the `.env` file with your API base URL:
-```
+Defina a URL da API:
+
+```env
 VITE_API_BASE_URL=http://localhost:3000
 ```
 
-## Development
+## Scripts
 
-Start the development server:
 ```bash
-npm run dev
+npm run dev       # Servidor de desenvolvimento (http://localhost:5173)
+npm run build     # Build de produção
+npm run preview   # Preview do build
+npm run lint      # Linting
+npm test          # Testes em modo watch
+npm run test:run  # Testes (CI)
 ```
 
-The app will be available at `http://localhost:5173`
+## API
 
-## Building for Production
-
-Build the application:
-```bash
-npm run build
-```
-
-Preview the production build:
-```bash
-npm run preview
-```
-
-## Testing
-
-Run tests:
-```bash
-npm test
-```
-
-Run tests in watch mode:
-```bash
-npm test
-```
-
-Run tests once (CI mode):
-```bash
-npm run test:run
-```
-
-## Project Structure
-
-```
-src/
-├── components/       # Reusable React components
-│   └── ProtectedRoute.tsx
-├── hooks/           # Custom React hooks
-│   ├── useApi.ts
-│   └── useAuth.tsx
-├── pages/           # Page components
-│   ├── LoginPage.tsx
-│   ├── QuizzesPage.tsx
-│   ├── QuizPage.tsx
-│   └── ResultsPage.tsx
-├── services/        # API service layer
-│   ├── api.ts
-│   ├── auth.ts
-│   └── quiz.ts
-├── types/           # TypeScript type definitions
-│   └── index.ts
-├── utils/           # Utility functions
-├── App.tsx          # Main app component
-├── main.tsx         # App entry point
-└── index.css        # Global styles
-```
-
-## API Endpoints
-
-The application expects the following API endpoints:
-
-### Authentication
-- `POST /api/auth/login` - Login with email and password
-  - Request: `{ email: string, password: string }`
-  - Response: `{ token: string, user: { id, email, name } }`
+### Autenticação
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| POST | `/api/auth/login` | Login |
+| POST | `/api/auth/register` | Cadastro |
 
 ### Quizzes
-- `GET /api/quizzes` - List all available quizzes
-  - Response: `Quiz[]`
+| Método | Endpoint | Descrição |
+|--------|----------|-----------|
+| GET | `/api/quizzes` | Listar quizzes |
+| POST | `/api/quizzes` | Criar quiz |
+| GET | `/api/quizzes/:id` | Detalhes do quiz |
+| POST | `/api/quizzes/:id/submit` | Submeter respostas |
 
-### Questions
-- `GET /api/questions?quiz_id={id}` - Get questions for a quiz
-  - Alternative: `GET /api/quizzes/{id}?include_questions=true`
-  - Response: `Question[]`
+## Variáveis de Ambiente
 
-### Submit Quiz
-- `POST /api/quizzes/{id}/submit` - Submit quiz answers
-  - Alternative: `POST /api/questions/answers`
-  - Request: `{ answers: Array<{ questionId: string, selectedOption: number }> }`
-  - Response: `QuizResult`
+| Variável | Descrição | Padrão |
+|----------|-----------|--------|
+| `VITE_API_BASE_URL` | URL base da API | `http://localhost:3000` |
 
-## Features in Detail
+## Deploy
 
-### Authentication
-- JWT token-based authentication
-- Token stored in localStorage
-- Automatic token injection in API requests
-- Protected routes for authenticated users only
+O projeto faz deploy automático para **AWS S3** via GitHub Actions a cada push na branch `main`.
 
-### Quiz List
-- Displays all available quizzes
-- Shows quiz title, description, and question count
-- Click to start any quiz
+## Contribuindo
 
-### Quiz Taking
-- Question-by-question navigation
-- Visual progress indicator
-- Answer selection with instant feedback
-- Review and change answers before submission
-- Prevents submission if not all questions answered
+1. Fork o repositório
+2. Crie sua branch (`git checkout -b feature/minha-feature`)
+3. Commit suas mudanças (`git commit -m 'feat: add minha feature'`)
+4. Push para a branch (`git push origin feature/minha-feature`)
+5. Abra um Pull Request
 
-### Results
-- Overall score and percentage
-- Detailed breakdown of each question
-- Shows correct and incorrect answers
-- Option to take another quiz
+## Licença
 
-## Code Quality
-
-### Linting
-```bash
-npm run lint
-```
-
-### TypeScript
-The project uses strict TypeScript configuration for type safety.
-
-## Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `VITE_API_BASE_URL` | Backend API base URL | `http://localhost:3000` |
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License.
+MIT
