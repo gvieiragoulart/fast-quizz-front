@@ -4,6 +4,7 @@ import { useQuizQuestions, useSubmitQuiz } from '@/hooks/useApi'
 import type { Answer, Question, QuestionOption, QuizResult } from '@/types'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
+import { Input } from '@/components/ui/input'
 import { Progress } from '@/components/ui/progress'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Check, Loader2 } from 'lucide-react'
@@ -16,6 +17,7 @@ export default function QuizPage() {
   const submitQuiz = useSubmitQuiz()
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [answers, setAnswers] = useState<Answer[]>([])
+  const [respondentName, setRespondentName] = useState('')
 
   const currentQuestion = questions?.[currentQuestionIndex] as Question | undefined
 
@@ -40,6 +42,10 @@ export default function QuizPage() {
     if (!quizId || !questions) return
     if (answers.length !== questions.length) {
       alert('Por favor, responda todas as questões antes de enviar.')
+      return
+    }
+    if (!respondentName.trim()) {
+      alert('Por favor, informe seu nome antes de enviar.')
       return
     }
 
@@ -81,7 +87,12 @@ export default function QuizPage() {
         console.error('Submit API failed, using local result:', err)
       }
 
-      navigate(`/quiz/${quizId}/results`, { state: { result: apiResult ?? localResult } })
+      navigate(`/quiz/${quizId}/results`, {
+        state: {
+          result: apiResult ?? localResult,
+          respondentName: respondentName.trim(),
+        },
+      })
     } catch (error) {
       console.error('Failed to submit quiz:', error)
       alert('Falha ao enviar. Tente novamente.')
@@ -160,6 +171,21 @@ export default function QuizPage() {
             </div>
           </CardContent>
         </Card>
+
+        {/* Respondent name — shown when all questions are answered */}
+        {answers.length === questions.length && (
+          <div className="mb-4 space-y-1">
+            <label className="text-sm font-medium text-muted-foreground">
+              Seu nome <span className="text-red-500">*</span>
+            </label>
+            <Input
+              placeholder="Como devemos te chamar?"
+              value={respondentName}
+              onChange={(e) => setRespondentName(e.target.value)}
+              maxLength={200}
+            />
+          </div>
+        )}
 
         {/* Navigation */}
         <div className="flex justify-between">

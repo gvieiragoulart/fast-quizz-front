@@ -1,5 +1,5 @@
 import api from './api';
-import type { Question, SubmitQuizRequest, QuizResult, QuizListResponse, QuizRequestCreate, Quiz } from '../types';
+import type { Question, SubmitQuizRequest, QuizResult, QuizListResponse, QuizRequestCreate, Quiz, ResultSubmit, ResultResponse } from '../types';
 
 export const quizService = {
   async getQuizzes(): Promise<QuizListResponse> {
@@ -47,5 +47,15 @@ export const quizService = {
       console.error('Error creating quiz:', error);
       throw error;
     }
+  },
+
+  async submitResult(payload: ResultSubmit): Promise<ResultResponse> {
+    const response = await api.post<ResultResponse>('/api/results/', payload);
+    return response.data;
+  },
+
+  async getResultsByQuiz(quizId: string): Promise<{ items: ResultResponse[]; total: number }> {
+    const response = await api.get(`/api/results/quiz/${quizId}`);
+    return response.data;
   },
 };

@@ -1,15 +1,45 @@
+import { useEffect, useRef } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import type { QuizResult } from '@/types'
+import { useSubmitResult, useQuizResults } from '@/hooks/useApi'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
-import { CheckCircle2, XCircle } from 'lucide-react'
+import { CheckCircle2, XCircle, Users } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export default function ResultsPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const result = location.state?.result as QuizResult | undefined
+  const respondentName = location.state?.respondentName as string
+  const submitResult = useSubmitResult()
+  const submitted = useRef(false)
+
+  useEffect(() => {
+    if (!result || submitted.current) return
+    submitted.current = true
+    submitResult.mutate({
+      quiz_id: result.quizId,
+      respondent_name: respondentName,
+      score: Math.round(result.score),
+      total_questions: result.totalQuestions,
+    })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
+  const myResultId = submitResult.data?.id
+  const { data: communityData } = useQuizResults(
+    result?.quizId ?? '',
+    submitResult.isSuccess,
+  )
+
+  const otherResults = (communityData?.items.filter((r) => r.id !== myResultId) ?? [])
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 5)
+  const avgScore =
+    otherResults.length > 0
+      ? otherResults.reduce((sum, r) => sum + r.score, 0) / otherResults.length
+      : null
 
   if (!result) {
     return (
@@ -46,6 +76,60 @@ export default function ResultsPage() {
             <Button onClick={() => navigate('/')}>Fazer Outro Quiz</Button>
           </CardContent>
         </Card>
+
+        {/* Community results */}
+        {otherResults.length > 0 && (
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center gap-2 mb-4">
+                <Users className="w-5 h-5 text-muted-foreground" />
+                <h2 className="font-semibold text-lg">Como a galera está indo</h2>
+                <span className="ml-auto text-sm text-muted-foreground">{otherResults.length} resposta{otherResults.length !== 1 ? 's' : ''}</span>
+              </div>
+
+              {avgScore !== null && (
+                <div className="mb-4 p-3 rounded-lg bg-muted/50 flex items-center justify-between">
+                  <span className="text-sm text-muted-foreground">Média geral</span>
+                  <span className={cn(
+                    'font-bold text-lg',
+                    avgScore >= 70 ? 'text-emerald-600' : avgScore >= 40 ? 'text-yellow-600' : 'text-red-600'
+                  )}>
+                    {avgScore.toFixed(0)}%
+                  </span>
+                </div>
+              )}
+
+              <div className="space-y-2">
+                {otherResults
+                  .slice()
+                  .sort((a, b) => b.score - a.score)
+                  .map((r, index) => (
+                    <div key={r.id} className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground w-5 text-right">{index + 1}.</span>
+                      <span className="flex-1 text-sm truncate">{r.respondent_name}</span>
+                      <div className="flex items-center gap-2">
+                        <div className="w-24 h-2 rounded-full bg-muted overflow-hidden">
+                          <div
+                            className={cn(
+                              'h-full rounded-full',
+                              r.score >= 70 ? 'bg-emerald-500' : r.score >= 40 ? 'bg-yellow-500' : 'bg-red-500'
+                            )}
+                            style={{ width: `${r.score}%` }}
+                          />
+                        </div>
+                        <span className={cn(
+                          'text-sm font-semibold w-10 text-right',
+                          r.score >= 70 ? 'text-emerald-600' : r.score >= 40 ? 'text-yellow-600' : 'text-red-600'
+                        )}>
+                          {r.score}%
+                        </span>
+                      </div>
+                    </div>
+                  ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Detailed results */}
         <Card>

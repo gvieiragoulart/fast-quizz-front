@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authService } from '../services/auth';
 import { quizService } from '../services/quiz';
-import type { LoginRequest, RegisterRequest, SubmitQuizRequest, QuizRequestCreate } from '../types';
+import type { LoginRequest, RegisterRequest, SubmitQuizRequest, QuizRequestCreate, ResultSubmit } from '../types';
 
 export const useLogin = () => {
   const queryClient = useQueryClient();
@@ -62,5 +62,19 @@ export const useCreateQuiz = () => {
     onError: (error) => {
       console.error('Error creating quiz:', error)
     }
+  })
+}
+
+export const useSubmitResult = () => {
+  return useMutation({
+    mutationFn: (payload: ResultSubmit) => quizService.submitResult(payload),
+  })
+}
+
+export const useQuizResults = (quizId: string, enabled: boolean) => {
+  return useQuery({
+    queryKey: ['results', quizId],
+    queryFn: () => quizService.getResultsByQuiz(quizId),
+    enabled: !!quizId && enabled,
   })
 }
