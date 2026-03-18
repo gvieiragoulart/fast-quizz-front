@@ -5,12 +5,6 @@ interface HeroSectionProps {
   onCreateQuiz: () => void
 }
 
-const stats = [
-  { value: '500+', label: 'Quizzes Criados' },
-  { value: '10k+', label: 'Respostas' },
-  { value: '1k+', label: 'Usuários Ativos' },
-]
-
 export default function HeroSection({ onCreateQuiz }: HeroSectionProps) {
   return (
     <section className="relative overflow-hidden bg-gradient-to-br from-blue-600 to-purple-700 text-white py-20">
@@ -34,15 +28,6 @@ export default function HeroSection({ onCreateQuiz }: HeroSectionProps) {
           <Rocket className="mr-2 w-5 h-5" />
           Criar Meu Quiz Agora
         </Button>
-
-        <div className="grid grid-cols-3 gap-8 mt-16 max-w-lg mx-auto">
-          {stats.map((stat) => (
-            <div key={stat.label}>
-              <p className="text-4xl font-bold">{stat.value}</p>
-              <p className="text-sm opacity-80 mt-1">{stat.label}</p>
-            </div>
-          ))}
-        </div>
       </div>
     </section>
   )
