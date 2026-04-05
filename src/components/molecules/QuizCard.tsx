@@ -1,8 +1,19 @@
-import { Clock, BookOpen } from 'lucide-react'
+import { Clock } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardFooter } from '@/components/ui/card'
-import type { Quiz } from '@/types'
+import type { Quiz, QuizDifficulty } from '@/types'
+
+const difficultyConfig: Record<QuizDifficulty, { label: string; className: string }> = {
+  facil: { label: 'Fácil', className: 'bg-emerald-500 text-white' },
+  medio: { label: 'Médio', className: 'bg-yellow-500 text-white' },
+  dificil: { label: 'Difícil', className: 'bg-orange-500 text-white' },
+  expert: { label: 'Expert', className: 'bg-red-500 text-white' },
+}
+
+const API_BASE_URL = import.meta.env.VITE_ENVIRONMENT === 'development'
+  ? import.meta.env.VITE_API_DEV_BASE_URL
+  : import.meta.env.VITE_API_BASE_URL
 
 interface QuizCardProps {
   quiz: Quiz
@@ -11,15 +22,28 @@ interface QuizCardProps {
 }
 
 export default function QuizCard({ quiz, onStartQuiz, showNewBadge = false }: QuizCardProps) {
+  const difficultyInfo = quiz.difficulty ? difficultyConfig[quiz.difficulty] : null
+
   return (
     <Card className="h-full flex flex-col relative transition-all duration-300 hover:-translate-y-2 hover:shadow-lg">
-      {showNewBadge && (
-        <Badge className="absolute top-3 right-3 z-10 bg-orange-500 text-white font-bold">
-          NOVO
-        </Badge>
-      )}
+      <div className="absolute top-3 right-3 z-10 flex gap-1.5">
+        {showNewBadge && (
+          <Badge className="bg-orange-500 text-white font-bold">NOVO</Badge>
+        )}
+        {difficultyInfo && (
+          <Badge className={difficultyInfo.className}>{difficultyInfo.label}</Badge>
+        )}
+      </div>
 
-      <div className="h-40 bg-gradient-to-br from-blue-500 to-purple-600 rounded-t-lg" />
+      {quiz.image_url ? (
+        <img
+          src={`${API_BASE_URL}${quiz.image_url}`}
+          alt={quiz.title}
+          className="h-40 w-full object-cover rounded-t-lg"
+        />
+      ) : (
+        <div className="h-40 bg-gradient-to-br from-blue-500 to-purple-600 rounded-t-lg" />
+      )}
 
       <CardContent className="flex-1 pt-4">
         <h3 className="font-bold text-lg mb-1 line-clamp-2">{quiz.title}</h3>

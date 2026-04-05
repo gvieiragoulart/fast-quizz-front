@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useQuizzes } from '@/hooks/useApi'
 import HeroSection from '@/components/organisms/HeroSection'
@@ -7,8 +6,6 @@ import AllQuizzes from '@/components/organisms/AllQuizzes'
 
 export default function HomePage() {
   const navigate = useNavigate()
-  const [filterCategory, setFilterCategory] = useState('all')
-  const [filterDifficulty, setFilterDifficulty] = useState('all')
   const { data: quizzes, isLoading, isError } = useQuizzes()
 
   const handleCreateQuiz = () => navigate('/create')
@@ -23,10 +20,6 @@ export default function HomePage() {
         isLoading={isLoading}
         isError={isError}
         onStartQuiz={handleStartQuiz}
-        filterCategory={filterCategory}
-        setFilterCategory={setFilterCategory}
-        filterDifficulty={filterDifficulty}
-        setFilterDifficulty={setFilterDifficulty}
       />
     </div>
   )

@@ -1,9 +1,13 @@
+export type QuizDifficulty = 'facil' | 'medio' | 'dificil' | 'expert'
+
 export interface Quiz {
   id: string;
   title: string;
   description: string;
   estimated_time?: number;
   feedback_mode?: QuizFeedbackMode;
+  difficulty?: QuizDifficulty;
+  image_url?: string;
   questions?: Array<string>;
   createdAt?: string;
 }
@@ -21,6 +25,7 @@ export interface QuizRequestCreate {
   description: string;
   estimated_time?: number;
   feedback_mode?: QuizFeedbackMode;
+  difficulty?: QuizDifficulty;
   questions: Array<QuestionQuizCreate>;
 }
 

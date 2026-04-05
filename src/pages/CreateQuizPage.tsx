@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Plus, Trash2, ChevronLeft, ChevronRight, Upload, Save, HelpCircle, Clock } from 'lucide-react'
+import { Plus, Trash2, ChevronLeft, ChevronRight, Upload, Save, HelpCircle, Clock, ImagePlus, X } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -15,7 +15,7 @@ import {
   SelectTrigger,
 SelectValue,
 } from '@/components/ui/select'
-import type { QuizFeedbackMode } from '@/types'
+import type { QuizFeedbackMode, QuizDifficulty } from '@/types'
 import {
   Dialog,
   DialogContent,
@@ -25,7 +25,7 @@ import {
 } from '@/components/ui/dialog'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import type { Question } from '@/types'
-import { useCreateQuiz } from '@/hooks/useApi'
+import { useCreateQuiz, useUploadQuizImage } from '@/hooks/useApi'
 
 export default function CreateQuizPage() {
   const navigate = useNavigate()
@@ -33,6 +33,9 @@ export default function CreateQuizPage() {
   const [quizDescription, setQuizDescription] = useState('')
   const [estimatedTime, setEstimatedTime] = useState<number | ''>('')
   const [feedbackMode, setFeedbackMode] = useState<QuizFeedbackMode>('final')
+  const [difficulty, setDifficulty] = useState<QuizDifficulty | ''>('')
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [questions, setQuestions] = useState<Partial<Question>[]>([
     {
       text: '',
@@ -44,7 +47,8 @@ export default function CreateQuizPage() {
       ],
     },
   ])
-  const { mutate: createQuiz, isError } = useCreateQuiz()
+  const { mutateAsync: createQuiz } = useCreateQuiz()
+  const { mutateAsync: uploadImage } = useUploadQuizImage()
 
   const [activeStep, setActiveStep] = useState(0)
   const [isImportDialogOpen, setIsImportDialogOpen] = useState(false)
@@ -137,35 +141,65 @@ export default function CreateQuizPage() {
     }
   }
 
-  const handleSaveQuiz = () => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      setError('Formato de imagem inválido. Use JPEG, PNG ou WebP.')
+      return
+    }
+    if (file.size > 1 * 1024 * 1024) {
+      setError('A imagem deve ter no máximo 1 MB.')
+      return
+    }
+
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+    setError(null)
+  }
+
+  const removeImage = () => {
+    setImageFile(null)
+    if (imagePreview) URL.revokeObjectURL(imagePreview)
+    setImagePreview(null)
+  }
+
+  const handleSaveQuiz = async () => {
     if (!quizTitle) {
       setError('Por favor, insira um título para o quiz.')
       return
     }
 
-    createQuiz({
-      title: quizTitle,
-      description: quizDescription,
-      estimated_time: estimatedTime !== '' ? estimatedTime : undefined,
-      feedback_mode: feedbackMode,
-      questions: questions as Array<{
-        text: string
-        correct_answer: number
-        options: Array<{ reference_id: number; is_correct?: boolean; text: string }>
-      }>,
-    })
+    try {
+      const createdQuiz = await createQuiz({
+        title: quizTitle,
+        description: quizDescription,
+        estimated_time: estimatedTime !== '' ? estimatedTime : undefined,
+        feedback_mode: feedbackMode,
+        difficulty: difficulty || undefined,
+        questions: questions as Array<{
+          text: string
+          correct_answer: number
+          options: Array<{ reference_id: number; is_correct?: boolean; text: string }>
+        }>,
+      })
 
-    if (isError) {
+      if (imageFile && createdQuiz?.id) {
+        await uploadImage({ quizId: createdQuiz.id, file: imageFile })
+      }
+
+      setQuizTitle('')
+      setQuizDescription('')
+      setEstimatedTime('')
+      setFeedbackMode('final')
+      setDifficulty('')
+      removeImage()
+      setSuccessMessage('Quiz salvo com sucesso!')
+      navigate('/')
+    } catch {
       setError('Erro ao salvar o quiz. Tente novamente.')
-      return
     }
-
-    setQuizTitle('')
-    setQuizDescription('')
-    setEstimatedTime('')
-    setFeedbackMode('final')
-    setSuccessMessage('Quiz salvo com sucesso!')
-    navigate('/')
   }
 
   return (
@@ -266,6 +300,68 @@ export default function CreateQuizPage() {
                     </SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <Label htmlFor="quiz-difficulty">Dificuldade</Label>
+                <Select
+                  value={difficulty}
+                  onValueChange={(v) => setDifficulty(v as QuizDifficulty)}
+                >
+                  <SelectTrigger id="quiz-difficulty">
+                    <SelectValue placeholder="Selecionar..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="facil">
+                      <span className="font-medium text-emerald-600">Fácil</span>
+                    </SelectItem>
+                    <SelectItem value="medio">
+                      <span className="font-medium text-yellow-600">Médio</span>
+                    </SelectItem>
+                    <SelectItem value="dificil">
+                      <span className="font-medium text-orange-600">Difícil</span>
+                    </SelectItem>
+                    <SelectItem value="expert">
+                      <span className="font-medium text-red-600">Expert</span>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-1">
+                <Label>Imagem do Quiz</Label>
+                {imagePreview ? (
+                  <div className="relative rounded-lg overflow-hidden border h-[88px]">
+                    <img
+                      src={imagePreview}
+                      alt="Preview"
+                      className="w-full h-full object-cover"
+                    />
+                    <button
+                      type="button"
+                      onClick={removeImage}
+                      className="absolute top-1 right-1 bg-black/60 text-white rounded-full p-1 hover:bg-black/80"
+                    >
+                      <X className="w-3 h-3" />
+                    </button>
+                  </div>
+                ) : (
+                  <label
+                    htmlFor="quiz-image"
+                    className="flex items-center justify-center gap-2 h-[88px] border-2 border-dashed rounded-lg cursor-pointer hover:border-primary/50 hover:bg-muted/50 transition-colors"
+                  >
+                    <ImagePlus className="w-5 h-5 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground">Clique para enviar</span>
+                    <input
+                      id="quiz-image"
+                      type="file"
+                      accept="image/jpeg,image/png,image/webp"
+                      className="hidden"
+                      onChange={handleImageChange}
+                    />
+                  </label>
+                )}
+                <p className="text-xs text-muted-foreground">JPEG, PNG ou WebP (max 1 MB)</p>
               </div>
             </div>
           </CardContent>

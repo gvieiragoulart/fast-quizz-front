@@ -58,4 +58,13 @@ export const quizService = {
     const response = await api.get(`/api/results/quiz/${quizId}`);
     return response.data;
   },
+
+  async uploadQuizImage(quizId: string, file: File): Promise<Quiz> {
+    const formData = new FormData();
+    formData.append('file', file);
+    const response = await api.post<Quiz>(`/api/quizzes/${quizId}/image`, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+    });
+    return response.data;
+  },
 };

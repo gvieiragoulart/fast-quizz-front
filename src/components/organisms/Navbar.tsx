@@ -36,7 +36,11 @@ export default function Navbar() {
             <Button variant="ghost" onClick={() => navigate('/')}>
               Explorar
             </Button>
-            <Button variant="ghost">Meus Quizzes</Button>
+            {isAuthenticated && (
+              <Button variant="ghost" onClick={() => navigate('/my-quizzes')}>
+                Meus Quizzes
+              </Button>
+            )}
           </nav>
         </div>
 

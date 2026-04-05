@@ -26,6 +26,7 @@ function App() {
         <Router>
           <Routes>
             <Route element={<MainLayout />}>
+              <Route path="/my-quizzes" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
               <Route path="/quiz/:quizId" element={<QuizPage />} />

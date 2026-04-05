@@ -71,6 +71,18 @@ export const useSubmitResult = () => {
   })
 }
 
+export const useUploadQuizImage = () => {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: ({ quizId, file }: { quizId: string; file: File }) =>
+      quizService.uploadQuizImage(quizId, file),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['quizzes'] })
+    },
+  })
+}
+
 export const useQuizResults = (quizId: string, enabled: boolean) => {
   return useQuery({
     queryKey: ['results', quizId],
