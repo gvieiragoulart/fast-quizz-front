@@ -1,44 +1,26 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
-import { AuthProvider } from './hooks/useAuth'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
-import QuizPage from './pages/QuizPage'
-import ResultsPage from './pages/ResultsPage'
-import MainLayout from './components/templates/MainLayout'
-import ProtectedRoute from './components/ProtectedRoute'
-import CreateQuizPage from './pages/CreateQuizPage'
-import HomePage from './pages/HomePage'
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
+import { RouterProvider } from "react-router-dom"
+
+import { AuthProvider } from "@/contexts/auth"
+import { router } from "@/routes"
 
 const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
+    defaultOptions: {
+        queries: {
+            retry: 1,
+            refetchOnWindowFocus: false,
+        },
     },
-  },
 })
 
 function App() {
-  return (
-    <QueryClientProvider client={queryClient}>
-      <AuthProvider>
-        <Router>
-          <Routes>
-            <Route element={<MainLayout />}>
-              <Route path="/my-quizzes" element={<ProtectedRoute><HomePage /></ProtectedRoute>} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/quiz/:quizId" element={<QuizPage />} />
-              <Route path="/quiz/:quizId/results" element={<ResultsPage />} />
-              <Route path="/create" element={<ProtectedRoute><CreateQuizPage /></ProtectedRoute>} />
-              <Route path="/" element={<HomePage />} />
-            </Route>
-          </Routes>
-        </Router>
-      </AuthProvider>
-    </QueryClientProvider>
-  )
+    return (
+        <QueryClientProvider client={queryClient}>
+            <AuthProvider>
+                <RouterProvider router={router} />
+            </AuthProvider>
+        </QueryClientProvider>
+    )
 }
 
-export default App
+export { App }

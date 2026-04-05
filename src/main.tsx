@@ -1,21 +1,22 @@
-import { StrictMode } from 'react'
-import { createRoot } from 'react-dom/client'
-import './index.css'
-import App from './App.tsx'
+import { StrictMode } from "react"
+import { createRoot } from "react-dom/client"
+
+import { env } from "@/config/env"
+import { App } from "@/App"
+import "./index.css"
 
 async function enableMocking() {
-  console.log('Environment:', import.meta.env.VITE_ENVIRONMENT)
-  if (import.meta.env.VITE_MOCK !== 'development') {
-    return
-  }
-  const { worker } = await import('./mocks/browser.ts')
-  return worker.start()
+    if (env.VITE_MOCK !== "development") {
+        return
+    }
+    const { worker } = await import("./mocks/browser.ts")
+    return worker.start()
 }
 
 enableMocking().then(() => {
-  createRoot(document.getElementById('root')!).render(
-    <StrictMode>
-      <App />
-    </StrictMode>,
-  )
+    createRoot(document.getElementById("root")!).render(
+        <StrictMode>
+            <App />
+        </StrictMode>,
+    )
 })

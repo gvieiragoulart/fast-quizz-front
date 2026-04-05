@@ -1,0 +1,33 @@
+import { useNavigate } from "react-router-dom"
+
+import { useQuizzes } from "@/hooks/use-api"
+import { HeroSection } from "@/components/organisms/hero-section"
+import { RecentQuizzes } from "@/components/organisms/recent-quizzes"
+import { AllQuizzes } from "@/components/organisms/all-quizzes"
+
+function HomePage() {
+    const navigate = useNavigate()
+    const { data: quizzes, isLoading, isError } = useQuizzes()
+
+    const handleCreateQuiz = () => navigate("/create")
+    const handleStartQuiz = (quizId: number | string) =>
+        navigate(`/quiz/${quizId}`)
+
+    return (
+        <div className="min-h-screen bg-muted/30">
+            <HeroSection onCreateQuiz={handleCreateQuiz} />
+            <RecentQuizzes
+                quizzes={quizzes?.items}
+                onStartQuiz={handleStartQuiz}
+            />
+            <AllQuizzes
+                quizzes={quizzes?.items}
+                isLoading={isLoading}
+                isError={isError}
+                onStartQuiz={handleStartQuiz}
+            />
+        </div>
+    )
+}
+
+export { HomePage }
